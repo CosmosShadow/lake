@@ -3,7 +3,6 @@
 import os
 import sys
 import requests
-import xmltodict
 import socket
 from six.moves import queue as Queue
 from threading import Thread
