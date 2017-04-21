@@ -1,13 +1,23 @@
 # coding: utf-8
 import time
 import singleton
+import lake
 
 
 def time_cost(func):
 	def _time_cost(*args, **kwargs):
 		start = time.time()
 		ret = func(*args, **kwargs)
-		print("==> time-cost: %6f     %s" % (time.time() - start, func.__name__))	#TODO: 颜色
+		print("==> time-cost: %6f     %s" % (time.time() - start, func.__name__))
+		return ret
+	return _time_cost
+
+
+def time_cost_red(func):
+	def _time_cost(*args, **kwargs):
+		start = time.time()
+		ret = func(*args, **kwargs)
+		print(lake.string.color.red("time-cost: %6f     %s" % (time.time() - start, func.__name__)))
 		return ret
 	return _time_cost
 
@@ -24,7 +34,7 @@ def dump_args(func):
 
 
 if __name__ == '__main__':
-	@time_cost
+	@time_cost_red
 	@dump_args
 	def print_hello(a):
 		print 'hello', a
