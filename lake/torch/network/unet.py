@@ -10,11 +10,8 @@ class Unet(Base):
 		assert(input_nc == output_nc)
 
 		unet_block = UnetSkipConnectionBlock(ngf * 8, ngf * 8, innermost=True)
-		for i in range(num_downs - 5):
-			unet_block = UnetSkipConnectionBlock(ngf * 8, ngf * 8, unet_block, use_dropout=use_dropout)
-		unet_block = UnetSkipConnectionBlock(ngf * 4, ngf * 8, unet_block)
-		unet_block = UnetSkipConnectionBlock(ngf * 2, ngf * 4, unet_block)
-		unet_block = UnetSkipConnectionBlock(ngf, ngf * 2, unet_block)
+		for i in range(num_downs, 0, -1):
+			unet_block = UnetSkipConnectionBlock(ngf * min(8, 2**(i-1)), ngf * min(8, 2**i), unet_block)
 		unet_block = UnetSkipConnectionBlock(output_nc, ngf, unet_block, outermost=True)
 
 		self.model = unet_block
