@@ -10,10 +10,15 @@ class Base(nn.Module):
 		if len(self.gpu_ids) > 0:
 			assert(torch.cuda.is_available())
 
-	def init_weight(self):
+	def init_weights(self):
 		if len(self.gpu_ids) > 0:
 			self.cuda(device_id=self.gpu_ids[0])
 		self.apply(self._init_weight)
+
+	def print_net(self):
+		print(self)
+		params_count = sum([param.numel() for param in self.parameters()])
+		print('Total number of parameters: %d' % params_count)
 
 	def _init_weight(m):
 		classname = m.__class__.__name__
