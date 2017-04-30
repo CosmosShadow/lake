@@ -1,6 +1,7 @@
 # coding: utf-8
 from base import *
 from unet import *
+from instance_normalization import *
 
 def print_net(net):
 	print(net)

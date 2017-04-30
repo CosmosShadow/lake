@@ -5,14 +5,13 @@ from lake.torch.network.base import Base
 
 
 class Unet(Base):
-	def __init__(self, input_nc, output_nc, num_downs, ngf=64, norm_layer=nn.BatchNorm2d, use_dropout=False, gpu_ids=[]):
+	def __init__(self, nc, num_downs, ngf=64, norm_layer=nn.BatchNorm2d, use_dropout=False, gpu_ids=[]):
 		super(Unet, self).__init__(gpu_ids)
-		assert(input_nc == output_nc)
 
-		unet_block = UnetSkipConnectionBlock(ngf * 8, ngf * 8, innermost=True)
+		unet_block = UnetSkipConnectionBlock(ngf * 8, ngf * 8, innermost=True, use_dropout=use_dropout)
 		for i in range(num_downs, 0, -1):
-			unet_block = UnetSkipConnectionBlock(ngf * min(8, 2**(i-1)), ngf * min(8, 2**i), unet_block)
-		unet_block = UnetSkipConnectionBlock(output_nc, ngf, unet_block, outermost=True)
+			unet_block = UnetSkipConnectionBlock(ngf * min(8, 2**(i-1)), ngf * min(8, 2**i), unet_block, use_dropout=use_dropout)
+		unet_block = UnetSkipConnectionBlock(nc, ngf, unet_block, outermost=True, use_dropout=use_dropout)
 
 		self.model = unet_block
 

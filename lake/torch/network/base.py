@@ -7,6 +7,21 @@ class Base(nn.Module):
 		super(Base, self).__init__()
 		self.gpu_ids = gpu_ids
 		self.model = None
+		if len(self.gpu_ids) > 0:
+			assert(torch.cuda.is_available())
+
+	def init_weight(self):
+		if len(self.gpu_ids) > 0:
+			self.cuda(device_id=self.gpu_ids[0])
+		self.apply(self._init_weight)
+
+	def _init_weight(m):
+		classname = m.__class__.__name__
+		if classname.find('Conv') != -1:
+			m.weight.data.normal_(0.0, 0.02)
+		elif classname.find('BatchNorm2d') != -1 or  classname.find('InstanceNormalization') != -1:
+			m.weight.data.normal_(1.0, 0.02)
+			m.bias.data.fill_(0)
 
 	def forward(self, input):
 		assert self.model is not None
