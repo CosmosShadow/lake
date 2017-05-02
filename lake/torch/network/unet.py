@@ -1,23 +1,26 @@
 # coding: utf-8
 import torch
 import torch.nn as nn
+import lake
 from lake.torch.network.base import Base
 
 
 class Unet(Base):
-	def __init__(self, nc, num_downs, ngf=64, norm_layer=nn.BatchNorm2d, use_dropout=False, gpu_ids=[]):
-		super(Unet, self).__init__(gpu_ids)
+	def __init__(self, n_layers, nfs, dropout=False):
+		super(Unet, self).__init__()
+		assert n_layers >= 3
+		nfs = lake.array.extend(nfs, n_layers)
 
-		unet_block = UnetSkipConnectionBlock(ngf * 8, ngf * 8, innermost=True, use_dropout=use_dropout)
-		for i in range(num_downs, 0, -1):
-			unet_block = UnetSkipConnectionBlock(ngf * min(8, 2**(i-1)), ngf * min(8, 2**i), unet_block, use_dropout=use_dropout)
-		unet_block = UnetSkipConnectionBlock(nc, ngf, unet_block, outermost=True, use_dropout=use_dropout)
+		unet_block = UnetSkipConnectionBlock(nfs[-1], nfs[-1], innermost=True, dropout=dropout)
+		for i in range(1, n_layers-1):
+			unet_block = UnetSkipConnectionBlock(nfs[-i-1], nfs[-i], unet_block, dropout=dropout)
+		unet_block = UnetSkipConnectionBlock(nfs[0], nfs[1], unet_block, outermost=True, dropout=dropout)
 
 		self.model = unet_block
 
 
 class UnetSkipConnectionBlock(nn.Module):
-	def __init__(self, outer_nc, inner_nc, submodule=None, outermost=False, innermost=False, use_dropout=False):
+	def __init__(self, outer_nc, inner_nc, submodule=None, outermost=False, innermost=False, dropout=False):
 		super(UnetSkipConnectionBlock, self).__init__()
 		self.outermost = outermost
 
@@ -42,7 +45,7 @@ class UnetSkipConnectionBlock(nn.Module):
 			down = [downrelu, downconv, downnorm]
 			up = [uprelu, upconv, upnorm]
 
-			if use_dropout:
+			if dropout:
 				model = down + [submodule] + up + [nn.Dropout(0.5)]
 			else:
 				model = down + [submodule] + up
@@ -54,5 +57,17 @@ class UnetSkipConnectionBlock(nn.Module):
 			return self.model(x)
 		else:
 			return torch.cat([self.model(x), x], 1)
+
+
+if __name__ == '__main__':
+	net = Unet(3, [3, 64, 128])
+	net = Unet(5, [3, 64, 128])
+	net.print_net()
+
+
+
+
+
+
 
 

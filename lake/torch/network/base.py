@@ -1,11 +1,12 @@
 # coding: utf-8
 import torch
 import torch.nn as nn
+import lake
 
 class Base(nn.Module):
-	def __init__(self, gpu_ids=[]):
+	def __init__(self, gpu_ids=None):
 		super(Base, self).__init__()
-		self.gpu_ids = gpu_ids
+		self.gpu_ids = gpu_ids or lake.network.get_default_gpu_ids()
 		self.model = None
 		if len(self.gpu_ids) > 0:
 			assert(torch.cuda.is_available())
@@ -34,3 +35,11 @@ class Base(nn.Module):
 			return nn.parallel.data_parallel(self.model, input, self.gpu_ids)
 		else:
 			return self.model(input)
+
+	def save_network(self, save_path):
+		torch.save(self.cpu().state_dict(), save_path)
+		if len(gpu_ids) and torch.cuda.is_available():
+			self.cuda(device_id=gpu_ids[0])
+
+	def load_network(self, save_path):
+		network.load_state_dict(torch.load(save_path))
