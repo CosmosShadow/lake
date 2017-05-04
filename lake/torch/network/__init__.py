@@ -3,12 +3,13 @@ from base import *
 from unet import *
 from cnn import *
 from instance_normalization import *
-import lake.decorator.singleton as singleton
+from lake.decorator.singleton import singleton
 
 
 @singleton
 class GPU_IDS(object):
 	def __init__(self, gpu_ids):
+		super(GPU_IDS, self).__init__()
 		self.gpu_ids = gpu_ids
 
 def set_default_gpu_ids(gpu_ids):
