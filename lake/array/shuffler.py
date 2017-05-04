@@ -9,11 +9,19 @@ class Shuffler(object):
 		for i in range(1, len(self.datas)):
 			assert self.obj_size(self.datas[i]) == self.length
 
+
 	def obj_size(self, obj):
 		return len(obj) if isinstance(obj, list) else obj.size(0)
 
+
 	def __len__():
 		return self.length
+
+
+	def test(self, batch_size):
+		assert batch_size <= self.length
+		return (data[0:batch_size] for data in self.data)
+
 
 	def __call__(self, batch_size):
 		assert batch_size <= self.length
