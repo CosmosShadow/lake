@@ -1,4 +1,6 @@
 # coding: utf-8
+from shuffler import Shuffler
+
 
 def extend(values, count):
 	values = values if type(values) is list else [values]
