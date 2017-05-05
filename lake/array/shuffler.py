@@ -23,7 +23,7 @@ class Shuffler(object):
 		return (data[0:batch_size] for data in self.data)
 
 
-	def __call__(self, batch_size):
+	def __call__(self, batch_size, is_fix=True):
 		assert batch_size <= self.length
 
 		# shuffle原始数据
@@ -32,5 +32,10 @@ class Shuffler(object):
 		for i in range(len(self.datas)):
 			self.datas[i] = [self.datas[i][j] for j in perm] if isinstance(self.datas[i], list) else self.datas[i][perm]
 
-		for i in range(0, self.length+1-batch_size, batch_size):
-			yield (data[i:i+batch_size] for data in self.data)
+
+		if is_fix:
+			for i in range(0, self.length+1-batch_size, batch_size):
+				yield (data[i:i+batch_size] for data in self.data)
+		else:
+			for i in range(0, self.length, batch_size):
+				yield (data[i:min(i+batch_size, len(data))] for data in self.data)
