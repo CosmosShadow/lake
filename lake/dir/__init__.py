@@ -18,3 +18,4 @@ def check_dir(fname):
 	dname = os.path.dirname(fname)
 	if dname not in set([".", "..", ""]):
 		mkdir(dname)
+

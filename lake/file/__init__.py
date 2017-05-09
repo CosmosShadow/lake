@@ -1,14 +1,22 @@
 # coding: utf-8
 import csv
+import lake
 
 def write(data, path):
+	lake.dir.check_dir(path)
 	if path.endswith('.csv'):
 		wirte_csv(data, path)
+	else:
+		with open(path, "w") as text_file:
+			text_file.write(str(data))
 
 
 def read(path):
 	if path.endswith('.csv'):
-		read_csv(path)
+		return read_csv(path)
+	else:
+		with open(path, "r") as text_file:
+			return text_file.readlines()
 
 
 def wirte_csv(data, path):
@@ -23,3 +31,22 @@ def read_csv(path, delimiter=','):
 		reader = csv.reader(csvfile, delimiter=delimiter)
 		data = [line for line in reader]
 	return data
+
+
+if __name__ == '__main__':
+	import os
+	write('12q3q32', 'tmp/tmp/1.txt')
+	print read('tmp/tmp/1.txt')
+	os.system('rm -rf tmp')
+
+
+
+
+
+
+
+
+
+
+
+
