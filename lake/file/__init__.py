@@ -20,7 +20,7 @@ def read(path):
 		return read_csv(path)
 	else:
 		with open(path, "r") as text_file:
-			return text_file.readlines()
+			return [line.strip() for line in text_file.readlines()]
 
 
 def wirte_csv(data, path):
