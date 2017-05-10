@@ -1,6 +1,7 @@
 # coding: utf-8
 import csv
 import lake
+import json
 
 def write(data, path):
 	lake.dir.check_dir(path)
@@ -8,7 +9,10 @@ def write(data, path):
 		wirte_csv(data, path)
 	else:
 		with open(path, "w") as text_file:
-			text_file.write(str(data))
+			if isinstance(data, str):
+				text_file.write(str(data))
+			else:
+				text_file.write(json.dumps(data))
 
 
 def read(path):
