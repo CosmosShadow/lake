@@ -7,6 +7,8 @@ import lake
 
 
 def make_dataset(dir):
+	if dir.startswith('~'):
+		dir = dir.replace('~', os.environ['HOME'])
 	images = []
 	assert os.path.isdir(dir), '%s is not a valid directory' % dir
 
@@ -27,9 +29,7 @@ class ImageFolder(data.Dataset):
 	def __init__(self, root, transform=None, return_paths=False, loader=default_loader):
 		imgs = make_dataset(root)
 		if len(imgs) == 0:
-			raise(RuntimeError("Found 0 images in: " + root + "\n"
-			                   "Supported image extensions are: " + ",".join(IMG_EXTENSIONS)))
-		self.root = root
+			raise(RuntimeError("Found 0 images in: " + root))
 		self.imgs = imgs
 		self.transform = transform
 		self.return_paths = return_paths

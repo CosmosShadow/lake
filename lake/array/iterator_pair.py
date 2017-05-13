@@ -1,22 +1,21 @@
 # coding: utf-8
 import sys
+# from builtins import object
 
 
 class IteratorsPair(object):
 	# 迭代器组合
 	# 每次取datas的每一个data的一个元素，给成一个数组返回
-	def __init__(self, datas, max_size=None, fun=None):
+	def __init__(self, datas, max_size=None):
 		"""初始化
 		Args:
 			datas : Array of array, the size of each could be diffierent
 			max_size: 最大长度，当datas中data有长度大于max_size时，停止迭代
-			fun: 数据还需要进行的操作
 		"""
 		super(IteratorsPair, self).__init__()
 		self.datas = datas
 		self.stop_arr = [False] * len(datas)
 		self.max_size = max_size
-		self.fun = fun
 
 
 	def __iter__(self):
@@ -26,7 +25,7 @@ class IteratorsPair(object):
 		return self
 
 
-	def __next__(self):
+	def next(self):
 		results = []
 		for i, iterator in enumerate(self.iter_arr):
 			item = None
@@ -43,14 +42,14 @@ class IteratorsPair(object):
 			raise StopIteration()
 		else:
 			self.iter += 1
-			if self.fun is not None:
-				results = [self.fun(item) for item in results]
 			return results
 
 
 	def __len__(self):
-		return max([len(item) for item in self.datas] + ([self.max_size] if self.max_size is not None else []))
-
+		if self.max_size is None:
+			return max([len(item) for item in self.datas])
+		else:
+			return min(max([len(item) for item in self.datas]), self.max_size)
 
 
 
