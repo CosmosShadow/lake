@@ -2,10 +2,9 @@
 import sys
 
 
-class DatasPair(object):
-	# 数据匹配器
+class IteratorsPair(object):
+	# 迭代器组合
 	# 每次取datas的每一个data的一个元素，给成一个数组返回
-	`
 	def __init__(self, datas, max_size=None, fun=None):
 		"""初始化
 		Args:
@@ -13,7 +12,7 @@ class DatasPair(object):
 			max_size: 最大长度，当datas中data有长度大于max_size时，停止迭代
 			fun: 数据还需要进行的操作
 		"""
-		super(DatasPair, self).__init__()
+		super(IteratorsPair, self).__init__()
 		self.datas = datas
 		self.stop_arr = [False] * len(datas)
 		self.max_size = max_size
