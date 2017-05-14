@@ -3,7 +3,7 @@ import os
 import errno
 
 
-def mkdir(path):
+def mk(path):
 	try:
 		os.makedirs(path)
 	# Python >2.5
@@ -17,5 +17,5 @@ def mkdir(path):
 def check_dir(fname):
 	dname = os.path.dirname(fname)
 	if dname not in set([".", "..", ""]):
-		mkdir(dname)
+		mk(dname)
 

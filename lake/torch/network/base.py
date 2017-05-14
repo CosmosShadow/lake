@@ -19,7 +19,7 @@ class Base(nn.Module):
 	def print_net(self):
 		print(self)
 		params_count = sum([param.numel() for param in self.parameters()])
-		print('Total number of parameters: %d' % params_count)
+		print('Total number of parameters: %s' % lake.string.humman(params_count))
 
 	def _init_weight(self, m):
 		classname = m.__class__.__name__
@@ -38,8 +38,8 @@ class Base(nn.Module):
 
 	def save_network(self, save_path):
 		torch.save(self.cpu().state_dict(), save_path)
-		if len(gpu_ids) and torch.cuda.is_available():
-			self.cuda(device_id=gpu_ids[0])
+		if len(self.gpu_ids) > 0 and torch.cuda.is_available():
+			self.cuda(device_id=self.gpu_ids[0])
 
 	def load_network(self, save_path):
 		self.load_state_dict(torch.load(save_path))
