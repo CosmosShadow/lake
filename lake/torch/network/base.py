@@ -1,12 +1,12 @@
 # coding: utf-8
 import torch
 import torch.nn as nn
-import lake
+import lake.torch
 
 class Base(nn.Module):
 	def __init__(self, gpu_ids=None):
 		super(Base, self).__init__()
-		self.gpu_ids = gpu_ids or lake.network.get_default_gpu_ids()
+		self.gpu_ids = gpu_ids or lake.torch.network.get_default_gpu_ids()
 		self.model = None
 		if len(self.gpu_ids) > 0:
 			assert(torch.cuda.is_available())
@@ -21,7 +21,7 @@ class Base(nn.Module):
 		params_count = sum([param.numel() for param in self.parameters()])
 		print('Total number of parameters: %d' % params_count)
 
-	def _init_weight(m):
+	def _init_weight(self, m):
 		classname = m.__class__.__name__
 		if classname.find('Conv') != -1:
 			m.weight.data.normal_(0.0, 0.02)
@@ -42,4 +42,26 @@ class Base(nn.Module):
 			self.cuda(device_id=gpu_ids[0])
 
 	def load_network(self, save_path):
-		network.load_state_dict(torch.load(save_path))
+		self.load_state_dict(torch.load(save_path))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

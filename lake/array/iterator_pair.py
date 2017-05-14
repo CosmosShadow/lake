@@ -37,7 +37,7 @@ class IteratorsPair(object):
 				item = next(iterator)
 			results.append(item)
 
-		if all(self.stop_arr) or (self.max_size is not None and self.iter > self.max_size):
+		if all(self.stop_arr) or (self.max_size is not None and self.iter >= self.max_size):
 			self.stop_arr = [False] * len(self.datas)
 			raise StopIteration()
 		else:

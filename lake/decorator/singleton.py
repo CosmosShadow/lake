@@ -15,7 +15,7 @@ def singleton(cls, *args, **kwargs):
 	assert id(one) == id(two)
 	"""
 	instances = {}
-	def _singleton():
+	def _singleton(*args, **kwargs):
 		if cls not in instances:
 			instances[cls] = cls(*args, **kwargs)
 		return instances[cls]

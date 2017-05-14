@@ -9,11 +9,10 @@ from lake.decorator.singleton import singleton
 @singleton
 class GPU_IDS(object):
 	def __init__(self, gpu_ids):
-		super(GPU_IDS, self).__init__()
 		self.gpu_ids = gpu_ids
 
 def set_default_gpu_ids(gpu_ids):
 	GPU_IDS(gpu_ids)
 
 def get_default_gpu_ids():
-	return GPU_IDS([])
+	return GPU_IDS([]).gpu_ids
