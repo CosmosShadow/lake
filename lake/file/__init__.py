@@ -29,7 +29,6 @@ def wirte_csv(data, path):
 		for row in data:
 			writer.writerow(row)
 
-
 def read_csv(path, delimiter=','):
 	with file(path, 'rb') as csvfile:
 		reader = csv.reader(csvfile, delimiter=delimiter)
@@ -37,11 +36,20 @@ def read_csv(path, delimiter=','):
 	return data
 
 
+def add_csv(row, path):
+	with file(path, 'ab') as csvfile:
+		writer = csv.writer(csvfile)
+		writer.writerow(row)
+
+
+
 if __name__ == '__main__':
 	import os
 	write('12q3q32', 'tmp/tmp/1.txt')
 	print read('tmp/tmp/1.txt')
 	os.system('rm -rf tmp')
+
+	add_csv([1, 2, 3], '1.csv')
 
 
 
