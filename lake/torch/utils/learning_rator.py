@@ -19,7 +19,7 @@ class BaseLearningRator(object):
 		self.epoch += 1
 		self._step()
 		
-	def update_lr():
+	def update_lr(self):
 		lr = self.lr()
 		for opti in self.optimizers:
 			for param_group in opti.param_groups:
