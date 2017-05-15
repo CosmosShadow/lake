@@ -46,9 +46,9 @@ class DecayLearningRator(BaseLearningRator):
 		if self.epoch < self.decay_start:
 			self.current_lr = self.start_lr
 		else:
-			if (self.epoch - self.decay_start) % decay_step == 0:
+			if (self.epoch - self.decay_start) % self.decay_step == 0:
 				update = True
-			self.current_lr = self.start_lr * self.decay_rate ** ((self.epoch - self.decay_start) / decay_step)
+			self.current_lr = self.start_lr * (self.decay_rate ** ((self.epoch - self.decay_start) / self.decay_step))
 
 		if update == True:
 			self.update_lr()
