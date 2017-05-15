@@ -28,3 +28,23 @@ def flat(arr_arr):
 		arr: Array
 	"""
 	return list(itertools.chain.from_iterable(arr_arr))
+
+
+def is_in(arr, arr_arr):
+	for the_arr in arr_arr:
+		if len(arr) == len(the_arr):
+			if all([var1==var2 for var1, var2 in zip(arr, the_arr)]):
+				return True
+	return False
+
+
+
+
+
+
+
+
+
+
+
+

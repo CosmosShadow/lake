@@ -1,6 +1,7 @@
 # coding: utf-8
 import os
 import errno
+import shutil
 
 
 def mk(path):
@@ -12,6 +13,12 @@ def mk(path):
 			pass
 		else:
 			raise
+
+
+def remk(path):
+	if os.path.exists(path):
+		shutil.rmtree(path)
+	mk(path)
 
 
 def check_dir(fname):

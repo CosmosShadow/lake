@@ -3,16 +3,43 @@ import csv
 import lake
 import json
 
+
 def write(data, path):
 	lake.dir.check_dir(path)
 	if path.endswith('.csv'):
-		wirte_csv(data, path)
+		write_csv(data, path)
+	elif path.endswith('.dot'):
+		write_dot(data, path)
 	else:
-		with open(path, "w") as text_file:
-			if isinstance(data, str):
-				text_file.write(str(data))
-			else:
-				text_file.write(json.dumps(data))
+		write_txt(data, path)
+
+
+def write_txt(data, path):
+	with open(path, "w") as text_file:
+		if isinstance(data, str):
+			text_file.write(str(data))
+		else:
+			text_file.write(json.dumps(data))
+
+
+def write_csv(data, path):
+	with file(path, 'wb') as csvfile:
+		writer = csv.writer(csvfile)
+		for row in data:
+			writer.writerow(row)
+
+
+def write_dot(data, path):
+	dot = "digraph G {\n"
+	for item in data:
+		if len(item) == 2:
+			start, end = item[0], item[1]
+			dot += '    "%s"->"%s";\n' % (start, end)
+		if len(item) == 3:
+			start, end, color = item[0], item[1], item[2]
+			dot += '    "%s"->"%s" [color="%s"];\n' % (start, end, color)
+	dot += "}"
+	write_txt(dot, path)
 
 
 def read(path):
@@ -22,12 +49,6 @@ def read(path):
 		with open(path, "r") as text_file:
 			return [line.strip() for line in text_file.readlines()]
 
-
-def wirte_csv(data, path):
-	with file(path, 'wb') as csvfile:
-		writer = csv.writer(csvfile)
-		for row in data:
-			writer.writerow(row)
 
 def read_csv(path, delimiter=','):
 	with file(path, 'rb') as csvfile:
@@ -40,7 +61,6 @@ def add_csv(row, path):
 	with file(path, 'ab') as csvfile:
 		writer = csv.writer(csvfile)
 		writer.writerow(row)
-
 
 
 if __name__ == '__main__':
