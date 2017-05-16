@@ -6,29 +6,29 @@ from lake.torch.network.base import Base
 
 
 class Unet(Base):
-	def __init__(self, n_layers, nfs, dropout=False):
+	def __init__(self, n_layers, nfs, norm=nn.BatchNorm2d, dropout=False):
 		super(Unet, self).__init__()
 		assert n_layers >= 3
 		nfs = lake.array.extend(nfs, n_layers)
 
-		unet_block = UnetSkipConnectionBlock(nfs[-1], nfs[-1], innermost=True, dropout=dropout)
+		unet_block = UnetSkipConnectionBlock(nfs[-1], nfs[-1], innermost=True, norm=norm, dropout=dropout)
 		for i in range(1, n_layers-1):
-			unet_block = UnetSkipConnectionBlock(nfs[-i-1], nfs[-i], unet_block, dropout=dropout)
-		unet_block = UnetSkipConnectionBlock(nfs[0], nfs[1], unet_block, outermost=True, dropout=dropout)
+			unet_block = UnetSkipConnectionBlock(nfs[-i-1], nfs[-i], unet_block, norm=norm, dropout=dropout)
+		unet_block = UnetSkipConnectionBlock(nfs[0], nfs[1], unet_block, outermost=True, norm=norm, dropout=dropout)
 
 		self.model = unet_block
 
 
 class UnetSkipConnectionBlock(nn.Module):
-	def __init__(self, outer_nc, inner_nc, submodule=None, outermost=False, innermost=False, dropout=False):
+	def __init__(self, outer_nc, inner_nc, submodule=None, outermost=False, innermost=False, norm=nn.BatchNorm2d, dropout=False):
 		super(UnetSkipConnectionBlock, self).__init__()
 		self.outermost = outermost
 
 		downconv = nn.Conv2d(outer_nc, inner_nc, kernel_size=4, stride=2, padding=1)
 		downrelu = nn.LeakyReLU(0.2, True)
-		downnorm = nn.BatchNorm2d(inner_nc)
+		downnorm = norm(inner_nc)
 		uprelu = nn.ReLU(True)
-		upnorm = nn.BatchNorm2d(outer_nc)
+		upnorm = norm(outer_nc)
 
 		if outermost:
 			upconv = nn.ConvTranspose2d(inner_nc * 2, outer_nc, kernel_size=4, stride=2, padding=1)
