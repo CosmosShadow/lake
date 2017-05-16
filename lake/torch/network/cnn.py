@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import lake
 
-def gen_cnn(n_layers, nfs, kernels, strides, pads, norm=BatchNorm2d):
+def gen_cnn(n_layers, nfs, kernels, strides, pads, norm=nn.BatchNorm2d):
 	nfs = lake.array.extend(nfs, n_layers+1)
 	kernels = lake.array.extend(kernels, n_layers)
 	strides = lake.array.extend(strides, n_layers)
