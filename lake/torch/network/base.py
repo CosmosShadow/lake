@@ -26,7 +26,6 @@ class Base(nn.Module):
 		if classname.find('Conv') != -1:
 			m.weight.data.normal_(0.0, 0.02)
 		elif classname.find('BatchNorm2d') != -1 or  classname.find('InstanceNorm2d') != -1:
-			print m
 			m.weight.data.normal_(1.0, 0.02)
 			m.bias.data.fill_(0)
 
