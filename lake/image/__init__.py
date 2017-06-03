@@ -2,12 +2,17 @@
 from PIL import Image
 import matplotlib.pyplot as plt
 import lake
+import  os
+import sys
+
+
+
+IMG_EXTENSIONS = ['.jpg', '.JPG', '.jpeg', '.JPEG', '.png', '.PNG', '.ppm', '.PPM', '.bmp', '.BMP']
 
 def is_image_file(filename):
-	IMG_EXTENSIONS = ['.jpg', '.JPG', '.jpeg', '.JPEG', '.png', '.PNG', '.ppm', '.PPM', '.bmp', '.BMP']
 	return any(filename.endswith(extension) for extension in IMG_EXTENSIONS)
 
-def open(path):
+def open_image(path):
 	return Image.open(path).convert('RGB')
 
 def csv_to_image(data, save_path, dpi=200):
@@ -30,6 +35,21 @@ def csv_to_image(data, save_path, dpi=200):
 	fig.savefig(save_path, dpi=dpi)
 
 
+def clear_dir(images_dir):
+	images_path = lake.file.list_dir(images_dir, IMG_EXTENSIONS)
+	count = len(images_path)
+	for i, image_path in enumerate(images_path):
+		sys.stdout.write('\r%d/%d' % (i, count))
+		sys.stdout.flush()
+		try:
+			open_image(image_path)
+		except Exception as e:
+			print image_path
+			print ''
+			os.remove(image_path)
+
+
 if __name__ == '__main__':
 	data = [['x', 'y', 'z'], [1, 10, 9], [2, 5, 1], [3, 9, 0]]
 	csv_to_image(data, '1.png')
+
