@@ -4,7 +4,7 @@ import numpy as np
 
 def one_hot(num, index):
 	base = np.zeros(num)
-	if index >= 0 and index < num:
+	if 0 <= index < num:
 		base[index] = 1
 	return base
 
