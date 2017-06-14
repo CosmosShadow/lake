@@ -15,11 +15,11 @@ class Options(object):
 			self.parser.add_argument('--boolean', action='store_true', default=True, help='布尔值')
 			self.parser.add_argument('--list', nargs='+', default=['hello', 256, 8], help='数组')
 			# 强制需求: required=True
-		self.initialized = True
 
 	def __call__(self):
 		if not self.initialized:
 			self.initialize()
+			self.initialized = True
 		self.opt = self.parser.parse_args()
 
 		print('------------ Options -------------')
