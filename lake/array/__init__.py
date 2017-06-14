@@ -7,7 +7,7 @@ import random
 import numpy as np
 
 
-def extend(values, count):
+def extend(values, count, value=None):
 	"""扩展
 	Args:
 		values: Array
@@ -19,7 +19,8 @@ def extend(values, count):
 	if len(values) >= count:
 		return values[:count]
 	else:
-		return values + [values[-1]] * (count - len(values))
+		value = value or values[-1]
+		return values + [value] * (count - len(values))
 
 
 def flat(arr_arr):

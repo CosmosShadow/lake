@@ -26,3 +26,11 @@ class TestDataChapter(object):
 
 		assert len(sampled) == int(count * percent)
 		assert len(left) == int(count * (1-percent))
+
+	def test_exend(self):
+		a = [1, 2, 3]
+		assert len(lake.array.extend(a, 2)) == 2
+		assert len(lake.array.extend(a, 4)) == 4
+		assert len(lake.array.extend(a, 4, -1)) == 4
+		assert lake.array.extend(a, 4, -1)[-1] == -1
+		assert lake.array.extend(a, 4, -1)[0] == 1
