@@ -1,7 +1,7 @@
 # coding: utf-8
 from shuffler import Shuffler
+from ring_buffer import RingBuffer
 from iterator_pair import IteratorsPair
-
 import itertools
 
 
