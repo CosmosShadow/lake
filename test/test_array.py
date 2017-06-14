@@ -46,10 +46,16 @@ class TestDataChapter(object):
 		assert lake.array.is_in(b, a)
 		assert not lake.array.is_in(c, a)
 
-
-
-
-
+	def test_split_with_length(self):
+		data = range(100)
+		datas = lake.array.split_with_length(data, 11)
+		assert len(datas) == 100/11 + 1
+		datas = lake.array.split_with_length(data, 11, fix_length=True)
+		assert len(datas) == 100/11
+		datas = lake.array.split_with_length(data, 11, step=6, fix_length=True)
+		assert len(datas) == (100 - 11)/6 + 1
+		datas = lake.array.split_with_length(data, 11, step=6)
+		assert len(datas) == 100/6 + 1
 
 
 

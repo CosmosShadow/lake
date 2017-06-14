@@ -72,7 +72,17 @@ def sample(data, sample_rate):
 		return data[sample_index], data[left_index]
 
 
-
+def split_with_length(data, length, step=None, fix_length=False):
+	step = step or length
+	arr = []
+	for index in range(0, len(data), step):
+		if fix_length:
+			if index + length <= len(data):
+				arr.append(data[index: index+length])
+		else:
+			stop_index = min(index + length, len(data))
+			arr.append(data[index: stop_index])
+	return arr
 
 
 
