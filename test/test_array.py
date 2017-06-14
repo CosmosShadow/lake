@@ -34,3 +34,29 @@ class TestDataChapter(object):
 		assert len(lake.array.extend(a, 4, -1)) == 4
 		assert lake.array.extend(a, 4, -1)[-1] == -1
 		assert lake.array.extend(a, 4, -1)[0] == 1
+
+	def test_flat(self):
+		a = [[1, 2, 3], [4, 5]]
+		assert len(lake.array.flat(a)) == 5
+
+	def test_is_in(self):
+		a = [[1, 2], [3, 4], [5, 6]]
+		b = [1, 2]
+		c = [3, 1]
+		assert lake.array.is_in(b, a)
+		assert not lake.array.is_in(c, a)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
