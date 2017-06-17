@@ -1,4 +1,5 @@
 # coding: utf-8
+import numpy as np
 import lake
 
 
@@ -56,6 +57,14 @@ class TestDataChapter(object):
 		assert len(datas) == (100 - 11)/6 + 1
 		datas = lake.array.split_with_length(data, 11, step=6)
 		assert len(datas) == 100/6 + 1
+
+	def test_shuffle(self):
+		a = range(10)
+		b = np.array(a)
+		data = lake.array.Shuffler(a, b)
+		for item in data(2):
+			assert len(item[0]) == 2
+
 
 
 

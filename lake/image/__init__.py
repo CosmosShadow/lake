@@ -4,10 +4,16 @@ import matplotlib.pyplot as plt
 import lake
 import  os
 import sys
-
-
+from scipy.misc import *
 
 IMG_EXTENSIONS = ['.jpg', '.JPG', '.jpeg', '.JPEG', '.png', '.PNG', '.ppm', '.PPM', '.bmp', '.BMP']
+
+def read(path):
+	return imread(path)
+
+def save(data, path):
+	imsave(path, data)
+
 
 def is_image_file(filename):
 	return any(filename.endswith(extension) for extension in IMG_EXTENSIONS)

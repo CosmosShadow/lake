@@ -11,7 +11,7 @@ class Shuffler(object):
 
 
 	def obj_size(self, obj):
-		return len(obj) if isinstance(obj, list) else obj.size(0)
+		return len(obj) if isinstance(obj, list) else obj.shape[0]
 
 
 	def __len__():
@@ -20,7 +20,7 @@ class Shuffler(object):
 
 	def test(self, batch_size):
 		assert batch_size <= self.length
-		return (data[0:batch_size] for data in self.data)
+		return (data[0:batch_size] for data in self.datas)
 
 
 	def __call__(self, batch_size, is_fix=True):
@@ -35,7 +35,7 @@ class Shuffler(object):
 
 		if is_fix:
 			for i in range(0, self.length+1-batch_size, batch_size):
-				yield (data[i:i+batch_size] for data in self.data)
+				yield tuple([data[i:i+batch_size] for data in self.datas])
 		else:
 			for i in range(0, self.length, batch_size):
-				yield (data[i:min(i+batch_size, len(data))] for data in self.data)
+				yield tuple([data[i:min(i+batch_size, len(data))] for data in self.datas])
