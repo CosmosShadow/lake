@@ -23,11 +23,25 @@ class Base(nn.Module):
 
 	def _init_weight(self, m):
 		classname = m.__class__.__name__
-		if classname.find('Conv') != -1:
-			m.weight.data.normal_(0.0, 0.02)
-		elif classname.find('BatchNorm2d') != -1 or  classname.find('InstanceNorm2d') != -1:
+		if classname.find('BatchNorm2d') != -1 or  classname.find('InstanceNorm2d') != -1:
 			m.weight.data.normal_(1.0, 0.02)
 			m.bias.data.fill_(0)
+		elif classname.find('Conv') != -1:
+			weight_shape = list(m.weight.data.size())
+			fan_in = np.prod(weight_shape[1:4])
+			fan_out = np.prod(weight_shape[2:4]) * weight_shape[0]
+			w_bound = np.sqrt(6. / (fan_in + fan_out))
+			m.weight.data.uniform_(-w_bound, w_bound)
+			m.bias.data.fill_(0)
+		elif classname.find('Linear') != -1:
+			weight_shape = list(m.weight.data.size())
+			fan_in = weight_shape[1]
+			fan_out = weight_shape[0]
+			w_bound = np.sqrt(6. / (fan_in + fan_out))
+			m.weight.data.uniform_(-w_bound, w_bound)
+			m.bias.data.fill_(0)
+		else:
+			pass
 
 	def forward(self, input):
 		assert self.model is not None

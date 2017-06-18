@@ -6,13 +6,12 @@ import  os
 import sys
 from scipy.misc import *
 
+# imread
+# imsave
+# imresize
+# 
+
 IMG_EXTENSIONS = ['.jpg', '.JPG', '.jpeg', '.JPEG', '.png', '.PNG', '.ppm', '.PPM', '.bmp', '.BMP']
-
-def read(path):
-	return imread(path)
-
-def save(data, path):
-	imsave(path, data)
 
 
 def is_image_file(filename):
