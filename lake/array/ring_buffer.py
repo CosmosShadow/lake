@@ -2,10 +2,10 @@
 
 class RingBuffer(object):
 	def __init__(self, maxlen):
-		self.maxlen = maxlen
+		self.maxlen = int(maxlen)
 		self.start = 0
 		self.length = 0
-		self.data = [None for _ in range(maxlen)]
+		self.data = [None for _ in range(self.maxlen)]
 
 	def __len__(self):
 		return self.length
