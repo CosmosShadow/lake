@@ -11,8 +11,16 @@ class Base(nn.Module):
 		if len(self.gpu_ids) > 0:
 			assert(torch.cuda.is_available())
 
+	@property
+	def use_cuda(self):
+		return self.gpu_ids is not None and len(self.gpu_ids) > 0 and torch.cuda.is_available()
+
+	@property
+	def multi_gpu(self):
+		return self.use_cuda and len(self.gpu_ids) > 1
+
 	def init_weights(self):
-		if len(self.gpu_ids) > 0:
+		if self.use_cuda:
 			self.cuda(device_id=self.gpu_ids[0])
 		self.apply(self._init_weight)
 
@@ -45,14 +53,14 @@ class Base(nn.Module):
 
 	def forward(self, input):
 		assert self.model is not None
-		if self.gpu_ids and isinstance(input.data, torch.cuda.FloatTensor):
+		if self.multi_gpu and isinstance(input.data, torch.cuda.FloatTensor):
 			return nn.parallel.data_parallel(self.model, input, self.gpu_ids)
 		else:
 			return self.model(input)
 
 	def save_network(self, save_path):
 		torch.save(self.cpu().state_dict(), save_path)
-		if len(self.gpu_ids) > 0 and torch.cuda.is_available():
+		if self.use_cuda:
 			self.cuda(device_id=self.gpu_ids[0])
 
 	def load_network(self, save_path):
