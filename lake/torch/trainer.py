@@ -58,3 +58,12 @@ class Trainer(object):
 			if self.epoch % self.save_per == 0:
 				self.model.save_network(self.save_path)
 
+# 学习率衰减
+# def exp_lr_scheduler(optimizer, epoch, lr_decay=0.1, lr_decay_epoch=7):
+#     """Decay learning rate by a factor of lr_decay every lr_decay_epoch epochs"""
+#     if epoch % lr_decay_epoch:
+#         return optimizer
+    
+#     for param_group in optimizer.param_groups:
+#         param_group['lr'] *= lr_decay
+#     return optimizer
