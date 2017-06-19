@@ -2,6 +2,8 @@
 from shuffler import Shuffler
 from ring_buffer import RingBuffer
 from iterator_pair import IteratorsPair
+from sample_ import *
+
 import itertools
 import random
 import numpy as np
@@ -44,32 +46,6 @@ def is_in(arr, arr_arr):
 			if all([var1==var2 for var1, var2 in zip(arr, the_arr)]):
 				return True
 	return False
-
-
-def sample(data, sample_rate):
-	"""
-	Args:
-		data : list or numpy
-		sample_rate : 
-	Returns:
-		sampled, left
-	"""
-	count = len(data)
-	perm = np.arange(count)
-	np.random.shuffle(perm)
-
-	sample_count = int(count * sample_rate) if isinstance(sample_rate, float) else sample_rate
-
-	assert sample_count > 0
-	assert sample_count < count
-
-	sample_index = perm[:sample_count]
-	left_index = perm[sample_count:]
-
-	if isinstance(data, list):
-		return [data[i] for i in sample_index], [data[i] for i in left_index]
-	else:
-		return data[sample_index], data[left_index]
 
 
 def split_with_length(data, length, step=None, fix_length=False):

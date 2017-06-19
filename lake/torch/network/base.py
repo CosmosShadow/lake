@@ -1,7 +1,9 @@
 # coding: utf-8
+import numpy as np
 import torch
 import torch.nn as nn
 import lake.torch
+
 
 class Base(nn.Module):
 	def __init__(self, gpu_ids=None):
@@ -18,6 +20,10 @@ class Base(nn.Module):
 	@property
 	def multi_gpu(self):
 		return self.use_cuda and len(self.gpu_ids) > 1
+
+	@property
+	def dtype(self):
+		return torch.cuda.FloatTensor if self.use_cuda else torch.FloatTensor
 
 	def init_weights(self):
 		if self.use_cuda:
