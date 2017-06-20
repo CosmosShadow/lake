@@ -26,6 +26,10 @@ class Trainer(object):
 		# TODO: current epoch
 		# TODO: logger
 		self.save_path = './outputs/%s/checkpoint.pth' % self.name
+		self.csv_path = './outputs/%s/log.csv' % self.name
+		self.logger = './outputs/%s/train.log' % self.name
+		self.logger = './outputs/%s/option.txt' % self.name
+
 		lake.dir.check_dir('./outputs/')
 		lake.dir.check_dir(self.save_path)
 
