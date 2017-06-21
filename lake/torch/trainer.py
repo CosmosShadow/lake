@@ -1,4 +1,5 @@
 # coding: utf-8
+import argparse
 import lake
 import torch
 
@@ -6,14 +7,6 @@ import torch
 class Trainer(object):
 	def __init__(self, data, model, optimizer=None, opt=None):
 		self.opt = opt
-		self.save_per = getattr(opt, 'save_per', 100)
-		self.print_per = getattr(opt, 'print_per', 10)
-		self.clip_grad = getattr(opt, 'clip_grad', 0.1)
-		lr = getattr(opt, 'lr', 1e-3)
-		weight_decay = getattr(opt, 'weight_decay', 1e-5)
-
-		self.name = getattr(opt, 'name', 'tmp')
-		self.epochs = getattr(opt, 'epochs', 10000)
 
 		self.data = data
 		self.model = model
@@ -22,13 +15,29 @@ class Trainer(object):
 		self.hooks = []
 		self._load_env()
 
+	def _load_opt(self):
+		parser = argparse.ArgumentParser()
+		opt = self.parser.parse_args()
+
+		if hasattr(opt, 'output'):
+			self.output = opt.output
+		else:
+			self.output = 'tmp'
+
+		if hasattr(opt, 'option'):
+			opt.option
+		elif hasattr(opt, 'output'):
+			self.save_path = './outputs/%s/checkpoint.pth' % self.output
+
+
+
 	def _load_env(self):
 		# TODO: current epoch
 		# TODO: logger
-		self.save_path = './outputs/%s/checkpoint.pth' % self.name
-		self.csv_path = './outputs/%s/log.csv' % self.name
-		self.logger = './outputs/%s/train.log' % self.name
-		self.logger = './outputs/%s/option.txt' % self.name
+		self.save_path = './outputs/%s/checkpoint.pth' % self.output
+		self.csv_path = './outputs/%s/log.csv' % self.output
+		self.logger = './outputs/%s/train.log' % self.output
+		self.logger = './outputs/%s/option.txt' % self.output
 
 		lake.dir.check_dir('./outputs/')
 		lake.dir.check_dir(self.save_path)
@@ -43,7 +52,7 @@ class Trainer(object):
 		if fun is not None:
 			self.hooks.append((interval, fun))
 
-	def run(self):
+	def train(self):
 		while self.epoch < self.epochs:
 			batch = self.data.next()
 			error = self.model.train(batch)
