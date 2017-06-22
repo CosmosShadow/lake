@@ -5,6 +5,9 @@ import lake
 import  os
 import sys
 from scipy.misc import *
+from matplotlib.ticker import FuncFormatter
+import numpy as np
+
 
 # imread
 # imsave
@@ -53,6 +56,27 @@ def clear_dir(images_dir):
 			print ''
 			os.remove(image_path)
 
+
+def save_hist(data, save_path, bins=None, to_percentage=False):
+    """
+    bins = np.linspace(0, 200, 201)
+
+    """
+    if bins is None:
+    	bins = np.linspace(data.min(), data.max()+1, 100)
+    fig = plt.gcf()
+    plt.hist(data, bins=bins, alpha=0.5, label='num', color='red')
+    plt.legend(loc='upper right')
+    plt.xlim(0,len(bins)-1)
+    plt.xlabel('x')
+    plt.ylabel('y')
+
+    if to_percentage:
+        to_percentage = lambda y, pos: str(round( ( y / float(len(data)) ) * 100.0, 2)) + '%'
+        plt.gca().yaxis.set_major_formatter(FuncFormatter(to_percentage))
+
+    fig.savefig(save_path, dpi=200)
+    plt.close('all')
 
 if __name__ == '__main__':
 	data = [['x', 'y', 'z'], [1, 10, 9], [2, 5, 1], [3, 9, 0]]
