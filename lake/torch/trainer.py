@@ -1,58 +1,89 @@
 # coding: utf-8
+import os
 import argparse
 import lake
 import torch
+import logging
 
 
 class Trainer(object):
-	def __init__(self, data, model, optimizer=None, opt=None):
-		self.opt = opt
-
-		self.data = data
-		self.model = model
-		self.optimizer = optimizer or torch.optim.Adam(self.model.parameters(), lr=lr, weight_decay=weight_decay)
-
+	def __init__(self):
+		self.data = None
+		self.model = None
+		self.optimizer = None
 		self.hooks = []
-		self._load_env()
+		self._load()
 
-	def _load_opt(self):
+	def _load(self):
+		# 解析命令行输入
 		parser = argparse.ArgumentParser()
-		opt = self.parser.parse_args()
+		args = self.parser.parse_args()
 
-		if hasattr(opt, 'output'):
-			self.output = opt.output
+		self._load_output_dir(args)
+		self._load_opt(args)
+		self._config_logging()
+
+		self.save_path = self._output_dir + 'checkpoint.pth' % self.output
+		self.csv_path = self._output_dir + 'log.csv' % self.output
+
+	def _load_output_dir(self, args):
+		# 确定输出目录，默认 tmp
+		if hasattr(args, 'output'):
+			self.output = args.output
 		else:
 			self.output = 'tmp'
-
-		if hasattr(opt, 'option'):
-			opt.option
-		elif hasattr(opt, 'output'):
-			self.save_path = './outputs/%s/checkpoint.pth' % self.output
-
-
-
-	def _load_env(self):
-		# TODO: current epoch
-		# TODO: logger
-		self.save_path = './outputs/%s/checkpoint.pth' % self.output
-		self.csv_path = './outputs/%s/log.csv' % self.output
-		self.logger = './outputs/%s/train.log' % self.output
-		self.logger = './outputs/%s/option.txt' % self.output
+		self._output_dir  = './outputs/%s/' + self.output
 
 		lake.dir.check_dir('./outputs/')
-		lake.dir.check_dir(self.save_path)
+		lake.dir.check_dir(self._output_dir)
 
+	def _load_opt(self, args):
+		"""加载option，顺序为:
+		1、使用保存目录里的
+		2、使用命令行指定的
+		3、默认: option_base
+		后两者需要保存到_output_dir目录下
+		"""
+		self._option_path = self._output_dir + 'option.json'
+		if os.path.exists(self._option_path):
+			option_json = lake.file.read(self._option_path)
+			option_dict = json.loads(option_json)
+			self.opt = namedtuple('X', option_dict.keys())(*option_dict.values())
+		else:
+			option_name = args.option if hasattr(args, 'option') else 'base'
+			opt_pkg = __import__('option_' + name)
+			self.opt = opt_pkg.Options()()
+			option_json = json.dumps(vars(self.opt), indent=4)
+			lake.file.write(option_json, self._option_path)
+
+	def _config_logging(self):
+		log_path = self._output_dir + 'train.log'
+		logging.basicConfig(
+				filename = log_path,
+				filemode = 'a',
+				level = logging.DEBUG,
+				format = '%(asctime)s - %(levelname)s - %(name)s[line:%(lineno)d]: %(message)s')
+		self._logger = logging.getLogger()
+
+	def _check_train_components(self):
+		"""检测训练要素"""
+		assert self.data is not None
+		assert self.model is not None
 		try:
 			self.model.load_network(self.save_path)
 			print lake.string.color.red('load network success')
 		except Exception as e:
 			print lake.string.color.red('load newtork fail')
+		self.optimizer = self.optimizer or torch.optim.Adam(self.model.parameters(), lr=self.opt.lr, weight_decay=self.opt.weight_decay)
 
-	def hook(self, interval=1, fun=None):
+	def add_hook(self, interval=1, fun=None):
+		"""添加钩子: 训练过程中，间隔interval执行fun函数"""
 		if fun is not None:
 			self.hooks.append((interval, fun))
 
 	def train(self):
+		self._check_train_components()
+
 		while self.epoch < self.epochs:
 			batch = self.data.next()
 			error = self.model.train(batch)
@@ -66,6 +97,7 @@ class Trainer(object):
 			# TODO: 存储loss
 			loss = error.data[0]
 
+			# self._logger.info('start train')
 			for interval, fun in self.hooks:
 				if self.epoch % interval == 0:
 					fun()
