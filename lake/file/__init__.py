@@ -50,6 +50,9 @@ def write_dot(data, path):
 def read(path):
 	if path.endswith('.csv'):
 		return read_csv(path)
+	elif path.endswith('.json'):
+		with open(path, "r") as text_file:
+			return ''.join(text_file.readlines())
 	else:
 		with open(path, "r") as text_file:
 			return [line.strip() for line in text_file.readlines()]
