@@ -3,6 +3,7 @@ from shuffler import Shuffler
 from ring_buffer import RingBuffer
 from iterator_pair import IteratorsPair
 from sample_ import *
+from count_next_interface import *
 
 import itertools
 import random

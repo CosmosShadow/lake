@@ -70,7 +70,7 @@ def add_csv(row, path):
 		writer = csv.writer(csvfile)
 		writer.writerow(row)
 
-		
+
 def add_txt(data, path):
 	with open(path, "ab") as text_file:
 		if isinstance(data, str):
