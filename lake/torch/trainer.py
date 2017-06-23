@@ -1,9 +1,12 @@
 # coding: utf-8
 import os
+import sys
+import json
 import argparse
 import lake
 import torch
 import logging
+from collections import namedtuple
 
 
 class Trainer(object):
@@ -19,11 +22,11 @@ class Trainer(object):
 	def _load(self):
 		# 解析命令行输入
 		parser = argparse.ArgumentParser()
-		args = self.parser.parse_args()
+		args = parser.parse_args()
 
 		self._load_output_dir(args)
-		self.save_path = self._output_dir + 'checkpoint.pth' % self.output
-		self.record_path = self._output_dir + 'record.txt' % self.output
+		self.save_path = self._output_dir + 'checkpoint.pth'
+		self.record_path = self._output_dir + 'record.txt'
 
 		self._load_opt(args)
 		self._config_logging()
@@ -35,7 +38,7 @@ class Trainer(object):
 			self.output = args.output
 		else:
 			self.output = 'tmp'
-		self._output_dir  = './outputs/%s/' + self.output
+		self._output_dir  = './outputs/%s/' % self.output
 
 		lake.dir.check_dir('./outputs/')
 		lake.dir.check_dir(self._output_dir)
@@ -54,7 +57,9 @@ class Trainer(object):
 			self.opt = namedtuple('X', option_dict.keys())(*option_dict.values())
 		else:
 			option_name = args.option if hasattr(args, 'option') else 'base'
-			opt_pkg = __import__('options.option_' + name)
+			sys.path.append('options')
+			opt_pkg = __import__('option_' + option_name)
+			print opt_pkg
 			self.opt = opt_pkg.Options()()
 			option_json = json.dumps(vars(self.opt), indent=4)
 			lake.file.write(option_json, self._option_path)
@@ -66,18 +71,14 @@ class Trainer(object):
 				filemode = 'a',
 				level = logging.DEBUG,
 				format = '%(asctime)s - %(levelname)s - %(name)s[line:%(lineno)d]: %(message)s')
-		self._logger = logging.getLogger()
+		self._logger = logging.getLogger(__name__)
 
 	def _load_epoch(self):
 		self.epoch = 1
-		try:
+		if os.path.exists(self.record_path):
 			records = lake.file.read(self.record_path)
-			self.epoch = int(json.load(records[-1])['epoch'])
-			self._logger.info('load epoch from record.txt')
-		except Exception as e:
-			self._logger.info(e)
-		self._logger.info('start epoch %d' % self.epoch)
-
+			if len(records) > 0:
+				self.epoch = int(json.load(records[-1])['epoch'])
 
 	def _check_train_components(self):
 		"""检测训练要素"""
@@ -137,7 +138,7 @@ class Trainer(object):
 			loss = error.data[0]
 			self.add_record('loss', loss)
 			for key, value in train_dict.iteritems():
-				if key ~= 'error':
+				if key != 'error':
 					self.add_record(key, value)
 
 			if self.epoch % self.opt.save_per == 0:
