@@ -6,6 +6,7 @@ import argparse
 import lake
 import torch
 import logging
+import numpy as np
 from collections import namedtuple
 
 
@@ -59,7 +60,6 @@ class Trainer(object):
 			option_name = args.option if hasattr(args, 'option') else 'base'
 			sys.path.append('options')
 			opt_pkg = __import__('option_' + option_name)
-			print opt_pkg
 			self.opt = opt_pkg.Options()()
 			option_json = json.dumps(vars(self.opt), indent=4)
 			lake.file.write(option_json, self._option_path)
@@ -77,8 +77,8 @@ class Trainer(object):
 		self.epoch = 1
 		if os.path.exists(self.record_path):
 			records = lake.file.read(self.record_path)
-			if len(records) > 0:
-				self.epoch = int(json.load(records[-1])['epoch'])
+			if len(records) > 0 and len(records[-1].strip()) > 0:
+				self.epoch = int(json.loads(records[-1])['epoch'])
 
 	def _check_train_components(self):
 		"""检测训练要素"""
@@ -115,7 +115,7 @@ class Trainer(object):
 		self._epoch_records['epoch'] = self.epoch
 		print self._epoch_records
 		record_json = json.dumps(self._epoch_records)
-		lake.file.add_txt(record_json, self.record_path)
+		lake.file.add_line(record_json, self.record_path)
 		self._clear_record()
 		self._logger.info(record_json)
 
@@ -136,7 +136,7 @@ class Trainer(object):
 				param.grad.data.clamp_(-self.opt.clip_grad, self.opt.clip_grad)
 			self.optimizer.step()
 
-			self.add_record('loss', float(error.data[0]))
+			self.add_record('loss', round(float(error.data[0]), 6))
 			for key, value in train_dict.iteritems():
 				if key != 'loss':
 					self.add_record(key, value)

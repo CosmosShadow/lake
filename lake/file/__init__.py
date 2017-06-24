@@ -82,6 +82,10 @@ def add_txt(data, path):
 		else:
 			text_file.write(json.dumps(data))
 
+def add_line(line, path):
+	with open(path, "ab") as text_file:
+		text_file.write(str(line) + '\n')
+
 
 if __name__ == '__main__':
 	import os
