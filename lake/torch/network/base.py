@@ -72,6 +72,12 @@ class Base(nn.Module):
 	def load_network(self, save_path):
 		self.load_state_dict(torch.load(save_path))
 
+	def train(self, data):
+		raise NotImplementedError("not implemented in base calss")
+
+	def test(self, data):
+		raise NotImplementedError("not implemented in base calss")
+
 
 
 

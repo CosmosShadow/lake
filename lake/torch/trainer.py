@@ -113,6 +113,7 @@ class Trainer(object):
 
 	def _store_record(self):
 		self._epoch_records['epoch'] = self.epoch
+		print self._epoch_records
 		record_json = json.dumps(self._epoch_records)
 		lake.file.add_txt(record_json, self.record_path)
 		self._clear_record()
@@ -125,20 +126,19 @@ class Trainer(object):
 
 		train_batch_count = self.data_train.count(self.opt.batch_size)
 
-		while self.epoch <= self.epochs:
+		while self.epoch <= self.opt.epochs:
 			batch = self.data_train.next(self.opt.batch_size)
 			train_dict = self.model.train(batch)
-			error = train_dict['error']
+			error = train_dict['loss']
 			self.optimizer.zero_grad()
 			error.backward()
 			for param in self.model.parameters():
-				param.grad.data.clamp_(-self.clip_grad, self.clip_grad)
+				param.grad.data.clamp_(-self.opt.clip_grad, self.opt.clip_grad)
 			self.optimizer.step()
 
-			loss = error.data[0]
-			self.add_record('loss', loss)
+			self.add_record('loss', float(error.data[0]))
 			for key, value in train_dict.iteritems():
-				if key != 'error':
+				if key != 'loss':
 					self.add_record(key, value)
 
 			if self.epoch % self.opt.save_per == 0:

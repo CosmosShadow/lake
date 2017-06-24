@@ -39,7 +39,7 @@ class Shuffler(CountNextInterface):
 
 	def next(self, batch_size):
 		assert batch_size <= self.length
-		if self.index + i > self.length:
+		if self.index + batch_size > self.length:
 			self.index = 0
 			self._shuffle()
 		return tuple([data[self.index: self.index+batch_size] for data in self.datas])
