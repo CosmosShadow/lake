@@ -20,3 +20,6 @@ class NNOptions(Options):
 		self.parser.add_argument('--output', type=str, default='tmp', help='output name')
 		self.parser.add_argument('--save_per', type=int, default=1e4, help='save interval')
 		self.parser.add_argument('--print_per', type=int, default=100, help='print interval')
+
+		# 默认一块GPU，内部会检测cuda是否可用，仅可用时生效
+		self.parser.add_argument('--gpu_ids', nargs='+', default=[0], help='gpu_ids, eg [0, 1]')

@@ -68,7 +68,8 @@ class Trainer(object):
 			lake.file.write(option_json, self._option_path)
 
 	def _set_gpu(self):
-		torch_network.set_default_gpu_ids([int(item) for item in self.opt.gpu_ids])
+		if torch.cuda.is_available():
+			torch_network.set_default_gpu_ids([int(item) for item in self.opt.gpu_ids])
 
 	def _config_logging(self):
 		log_path = self._output_dir + 'train.log'
@@ -86,7 +87,7 @@ class Trainer(object):
 		root = logging.getLogger()
 		ch = logging.StreamHandler(sys.stdout)
 		ch.setLevel(logging.DEBUG)
-		formatter = logging.Formatter(format)
+		formatter = logging.Formatter('%(message)s')
 		ch.setFormatter(formatter)
 		root.addHandler(ch)
 
@@ -103,16 +104,14 @@ class Trainer(object):
 		"""检测训练要素"""
 		assert self.data_train is not None
 		assert self.model is not None
+		print self.model
 		try:
 			self.model.load_network(self.save_path)
 			self._logger.info('load network success')
 		except Exception as e:
 			self._logger.info('load network fail')
 			self.epoch = 1
-		# self.optimizer = self.optimizer or torch.optim.Adam(self.model.parameters(), lr=self.opt.lr, weight_decay=self.opt.weight_decay)
-		self.optimizer = self.optimizer or torch.optim.SGD(self.model.parameters(), lr=self.opt.lr, momentum=0.5)
-
-		print self.model.parameters
+		self.optimizer = self.optimizer or torch.optim.Adam(self.model.parameters(), lr=self.opt.lr, weight_decay=self.opt.weight_decay)
 
 	def add_hook(self, interval=1, fun=None):
 		"""添加钩子: 训练过程中，间隔interval执行fun函数"""
@@ -141,7 +140,7 @@ class Trainer(object):
 		results = ['epoch: %d' % self.epoch]
 		for key, value in values.iteritems():
 			if key != 'epoch':
-				value = str(round(value, 6)) if isinstance(value, float) else str(value)
+				value = ('%.6f' % value) if isinstance(value, float) else str(value)
 				results.append('%s: %s' % (key, value))
 		self._logger.info('   '.join(results))
 
@@ -176,8 +175,8 @@ class Trainer(object):
 			error = train_dict['loss']
 			self.optimizer.zero_grad()
 			error.backward()
-			# for param in self.model.parameters():
-			# 	param.grad.data.clamp_(-self.opt.clip_grad, self.opt.clip_grad)
+			for param in self.model.parameters():
+				param.grad.data.clamp_(-self.opt.clip_grad, self.opt.clip_grad)
 			self.optimizer.step()
 
 			self.add_record('loss', float(error.data[0]))
