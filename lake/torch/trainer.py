@@ -9,6 +9,7 @@ import logging
 import numpy as np
 from collections import namedtuple
 import time
+import network as torch_network
 
 
 class Trainer(object):
@@ -31,6 +32,7 @@ class Trainer(object):
 		self.record_path = self._output_dir + 'record.txt'
 
 		self._load_opt(args)
+		self._set_gpu()
 		self._config_logging()
 		self._load_epoch()
 
@@ -64,6 +66,9 @@ class Trainer(object):
 			self.opt = opt_pkg.Options()()
 			option_json = json.dumps(vars(self.opt), indent=4)
 			lake.file.write(option_json, self._option_path)
+
+	def _set_gpu(self):
+		torch_network.set_default_gpu_ids([int(item) for item in self.opt.gpu_ids])
 
 	def _config_logging(self):
 		log_path = self._output_dir + 'train.log'
@@ -104,7 +109,10 @@ class Trainer(object):
 		except Exception as e:
 			self._logger.info('load network fail')
 			self.epoch = 1
-		self.optimizer = self.optimizer or torch.optim.Adam(self.model.parameters(), lr=self.opt.lr, weight_decay=self.opt.weight_decay)
+		# self.optimizer = self.optimizer or torch.optim.Adam(self.model.parameters(), lr=self.opt.lr, weight_decay=self.opt.weight_decay)
+		self.optimizer = self.optimizer or torch.optim.SGD(self.model.parameters(), lr=self.opt.lr, momentum=0.5)
+
+		print self.model.parameters
 
 	def add_hook(self, interval=1, fun=None):
 		"""添加钩子: 训练过程中，间隔interval执行fun函数"""
@@ -162,13 +170,14 @@ class Trainer(object):
 		train_batch_count = self.data_train.count(self.opt.batch_size)
 
 		while self.epoch <= self.opt.epochs:
+			self.model.train()
 			batch = self.data_train.next(self.opt.batch_size)
-			train_dict = self.model.train(batch)
+			train_dict = self.model.step_train(batch)
 			error = train_dict['loss']
 			self.optimizer.zero_grad()
 			error.backward()
-			for param in self.model.parameters():
-				param.grad.data.clamp_(-self.opt.clip_grad, self.opt.clip_grad)
+			# for param in self.model.parameters():
+			# 	param.grad.data.clamp_(-self.opt.clip_grad, self.opt.clip_grad)
 			self.optimizer.step()
 
 			self.add_record('loss', float(error.data[0]))
@@ -181,10 +190,11 @@ class Trainer(object):
 				self.add_record('save', 1)
 
 			if self.epoch % train_batch_count == 0 and self.data_test is not None:
+				self.model.eval()
 				results = []
 				for _ in range(self.data_test.count(self.opt.batch_size)):
 					batch = self.data_test.next(self.opt.batch_size)
-					result = self.model.test(batch)
+					result = self.model.step_test(batch)
 					results.append(result)
 				results_average = {}
 				for key in results[0].keys():
