@@ -10,10 +10,11 @@ class NNOptions(Options):
 	def _default_parameters(self):
 		self.parser.add_argument('--batch_size', type=int, default=2, help='batch_size')
 
-		self.parser.add_argument('--lr', type=float, default=1e-2, help='learning rate')
+		self.parser.add_argument('--lr', type=float, default=1e-4, help='learning rate')
 		self.parser.add_argument('--clip_grad', type=float, default=0.1, help='grad clip')
 		self.parser.add_argument('--weight_decay', type=float, default=1e-5, help='weight of nn decay')
 		self.parser.add_argument('--epochs', type=int, default=1e4, help='learn epochs')
 
 		self.parser.add_argument('--output', type=str, default='tmp', help='output name')
-		self.parser.add_argument('--save_per', type=int, default=100, help='save interval')
+		self.parser.add_argument('--save_per', type=int, default=1e4, help='save interval')
+		self.parser.add_argument('--print_per', type=int, default=100, help='print interval')

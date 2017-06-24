@@ -8,6 +8,7 @@ import torch
 import logging
 import numpy as np
 from collections import namedtuple
+import time
 
 
 class Trainer(object):
@@ -66,11 +67,24 @@ class Trainer(object):
 
 	def _config_logging(self):
 		log_path = self._output_dir + 'train.log'
+		format = '%(asctime)s - %(levelname)s - %(name)s[line:%(lineno)d]: %(message)s'
+
+		# 文件记录
 		logging.basicConfig(
 				filename = log_path,
+				stream = sys.stdout,
 				filemode = 'a',
 				level = logging.DEBUG,
-				format = '%(asctime)s - %(levelname)s - %(name)s[line:%(lineno)d]: %(message)s')
+				format = format)
+
+		# 控制台输出
+		root = logging.getLogger()
+		ch = logging.StreamHandler(sys.stdout)
+		ch.setLevel(logging.DEBUG)
+		formatter = logging.Formatter(format)
+		ch.setFormatter(formatter)
+		root.addHandler(ch)
+
 		self._logger = logging.getLogger(__name__)
 
 	def _load_epoch(self):
@@ -89,6 +103,7 @@ class Trainer(object):
 			self._logger.info('load network success')
 		except Exception as e:
 			self._logger.info('load network fail')
+			self.epoch = 1
 		self.optimizer = self.optimizer or torch.optim.Adam(self.model.parameters(), lr=self.opt.lr, weight_decay=self.opt.weight_decay)
 
 	def add_hook(self, interval=1, fun=None):
@@ -103,21 +118,41 @@ class Trainer(object):
 
 	def _clear_record(self):
 		self._epoch_records = {}
+		self._epoch_start = time.time()
 
 	def add_record(self, key, value):
+		if isinstance(value, float):
+			value = round(value, 6)
 		self._epoch_records[key] = value
 
 	def add_records(self, records):
 		for key, value in records.iteritems():
 			self.add_record(key, value)
 
+	def _epoch_log(self, values):
+		results = ['epoch: %d' % self.epoch]
+		for key, value in values.iteritems():
+			if key != 'epoch':
+				value = str(round(value, 6)) if isinstance(value, float) else str(value)
+				results.append('%s: %s' % (key, value))
+		self._logger.info('   '.join(results))
+
 	def _store_record(self):
-		self._epoch_records['epoch'] = self.epoch
-		print self._epoch_records
+		self.add_record('epoch', self.epoch)
+		self.add_record('time', time.time() - self._epoch_start)
 		record_json = json.dumps(self._epoch_records)
 		lake.file.add_line(record_json, self.record_path)
+		if self.epoch % self.opt.print_per == 0:
+			self._epoch_log(self._epoch_records)
 		self._clear_record()
-		self._logger.info(record_json)
+		# 每100才记录一次
+		# if self.epoch % self.opt.print_per == 0:
+		# 	self.add_record('epoch', self.epoch)
+		# 	self.add_record('time', time.time() - self._epoch_start)
+		# 	record_json = json.dumps(self._epoch_records)
+		# 	lake.file.add_line(record_json, self.record_path)
+		# 	self._epoch_log(self._epoch_records)
+		# 	self._clear_record()
 
 	def train(self):
 		self._check_train_components()
@@ -136,7 +171,7 @@ class Trainer(object):
 				param.grad.data.clamp_(-self.opt.clip_grad, self.opt.clip_grad)
 			self.optimizer.step()
 
-			self.add_record('loss', round(float(error.data[0]), 6))
+			self.add_record('loss', float(error.data[0]))
 			for key, value in train_dict.iteritems():
 				if key != 'loss':
 					self.add_record(key, value)
@@ -155,6 +190,7 @@ class Trainer(object):
 				for key in results[0].keys():
 					results_average['test_' + key] = np.mean([item[key] for item in results])
 				self.add_records(results_average)
+				self._epoch_log(results_average)
 
 			self._run_hook()
 			self._store_record()
