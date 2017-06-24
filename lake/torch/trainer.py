@@ -13,14 +13,23 @@ import network as torch_network
 
 
 class Trainer(object):
-	def __init__(self):
+	def __init__(self, log_to_console=True):
+		"""description
+		Args:
+			log_to_console: 显示到命令行，有其它模块设置了logging
+		"""
+		self.log_to_console = log_to_console
 		self.data_train = None
 		self.data_test = None
-		self.model = None
+		self._model = None
+		self.optimize_models = []
 		self.optimizer = None
 		self.hooks = []
 		self._load()
 		self._clear_record()
+
+	def add_optimize_model(self, optimize_model):
+		self.optimize_models.append(optimize_model)
 
 	def _load(self):
 		# 解析命令行输入
@@ -78,20 +87,34 @@ class Trainer(object):
 		# 文件记录
 		logging.basicConfig(
 				filename = log_path,
-				stream = sys.stdout,
 				filemode = 'a',
 				level = logging.DEBUG,
 				format = format)
 
 		# 控制台输出
-		root = logging.getLogger()
-		ch = logging.StreamHandler(sys.stdout)
-		ch.setLevel(logging.DEBUG)
-		formatter = logging.Formatter('%(message)s')
-		ch.setFormatter(formatter)
-		root.addHandler(ch)
+		if self.log_to_console:
+			root = logging.getLogger()
+			ch = logging.StreamHandler(sys.stdout)
+			ch.setLevel(logging.DEBUG)
+			formatter = logging.Formatter(format)
+			ch.setFormatter(formatter)
+			root.addHandler(ch)
 
 		self._logger = logging.getLogger(__name__)
+
+	@property
+	def model(self):
+		return self._model
+
+	@model.setter
+	def model(self, value):
+		self._model = value
+		try:
+			self._model.load_network(self.save_path)
+			self._logger.info('load network success')
+		except Exception as e:
+			self._logger.info('load network fail')
+			self.epoch = 1
 
 	def _load_epoch(self):
 		self.epoch = 1
@@ -103,15 +126,16 @@ class Trainer(object):
 	def _check_train_components(self):
 		"""检测训练要素"""
 		assert self.data_train is not None
-		assert self.model is not None
-		print self.model
-		try:
-			self.model.load_network(self.save_path)
-			self._logger.info('load network success')
-		except Exception as e:
-			self._logger.info('load network fail')
-			self.epoch = 1
-		self.optimizer = self.optimizer or torch.optim.Adam(self.model.parameters(), lr=self.opt.lr, weight_decay=self.opt.weight_decay)
+		assert self._model is not None
+		self._logger.info(self._model)
+		if self.optimizer is None:
+			if len(self.optimize_models) > 0:
+				self.optimizer = torch.optim.Adam(itertools.chain((model.parameters for model in self.optimize_models)), 
+				                                  lr=self.opt.lr, weight_decay=self.opt.weight_decay)
+			else:
+				self.optimizer = torch.optim.Adam(self._model.model.parameters(), 
+				                                  lr=self.opt.lr, weight_decay=self.opt.weight_decay)
+				self.optimize_models.append(self._model.model)
 
 	def add_hook(self, interval=1, fun=None):
 		"""添加钩子: 训练过程中，间隔interval执行fun函数"""
@@ -161,6 +185,8 @@ class Trainer(object):
 		# 	self._epoch_log(self._epoch_records)
 		# 	self._clear_record()
 
+
+
 	def train(self):
 		self._check_train_components()
 
@@ -169,14 +195,15 @@ class Trainer(object):
 		train_batch_count = self.data_train.count(self.opt.batch_size)
 
 		while self.epoch <= self.opt.epochs:
-			self.model.train()
+			self._model.train()
 			batch = self.data_train.next(self.opt.batch_size)
-			train_dict = self.model.step_train(batch)
+			train_dict = self._model.step_train(self.epoch, batch)
 			error = train_dict['loss']
 			self.optimizer.zero_grad()
 			error.backward()
-			for param in self.model.parameters():
-				param.grad.data.clamp_(-self.opt.clip_grad, self.opt.clip_grad)
+			for model in self.optimize_models:
+				for param in model.parameters():
+					param.grad.data.clamp_(-self.opt.clip_grad, self.opt.clip_grad)
 			self.optimizer.step()
 
 			self.add_record('loss', float(error.data[0]))
@@ -185,15 +212,15 @@ class Trainer(object):
 					self.add_record(key, value)
 
 			if self.epoch % self.opt.save_per == 0:
-				self.model.save_network(self.save_path)
+				self._model.save_network(self.save_path)
 				self.add_record('save', 1)
 
 			if self.epoch % train_batch_count == 0 and self.data_test is not None:
-				self.model.eval()
+				self._model.eval()
 				results = []
 				for _ in range(self.data_test.count(self.opt.batch_size)):
 					batch = self.data_test.next(self.opt.batch_size)
-					result = self.model.step_test(batch)
+					result = self._model.step_test(self.epoch, batch)
 					results.append(result)
 				results_average = {}
 				for key in results[0].keys():
