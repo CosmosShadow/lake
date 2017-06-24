@@ -170,6 +170,7 @@ class Trainer(object):
 
 	def _store_record(self):
 		self.add_record('epoch', self.epoch)
+		self.add_record('lr', self.current_lr)
 		self.add_record('time', time.time() - self._epoch_start)
 		record_json = json.dumps(self._epoch_records)
 		lake.file.add_line(record_json, self.record_path)
@@ -185,10 +186,16 @@ class Trainer(object):
 		# 	self._epoch_log(self._epoch_records)
 		# 	self._clear_record()
 
-
+	def _update_lr(self, force=False):
+		step = self.epoch - self.opt.lr_decay_start
+		if force or (step > 0 and step % self.opt.lr_decay_per == 0):
+			self.current_lr = self.opt.lr * (self.opt.lr_decay ** (step / self.opt.lr_decay_per))
+			for param_group in self.optimizer.param_groups:
+				param_group['lr'] = self.current_lr
 
 	def train(self):
 		self._check_train_components()
+		self._update_lr(force=True)
 
 		self._logger.info('train start')
 
@@ -232,16 +239,6 @@ class Trainer(object):
 			self._store_record()
 
 			self.epoch += 1
+			self._update_lr()
 
 		self._logger.info('train finish')
-
-
-# 学习率衰减
-# def exp_lr_scheduler(optimizer, epoch, lr_decay=0.1, lr_decay_epoch=7):
-#     """Decay learning rate by a factor of lr_decay every lr_decay_epoch epochs"""
-#     if epoch % lr_decay_epoch:
-#         return optimizer
-    
-#     for param_group in optimizer.param_groups:
-#         param_group['lr'] *= lr_decay
-#     return optimizer
