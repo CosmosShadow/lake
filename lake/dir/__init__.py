@@ -14,6 +14,9 @@ def mk(path):
 		else:
 			raise
 
+def rm(path):
+	if os.path.exists(path):
+		shutil.remove(path)
 
 def remk(path):
 	if os.path.exists(path):

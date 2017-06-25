@@ -2,6 +2,7 @@
 import csv
 import lake
 import json
+import os
 from loop_file import *
 
 
@@ -86,6 +87,10 @@ def add_line(line, path):
 	with open(path, "ab") as text_file:
 		text_file.write(str(line) + '\n')
 
+
+def rm(path):
+	if os.path.exists(path):
+		os.remove(path)
 
 if __name__ == '__main__':
 	import os
