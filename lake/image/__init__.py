@@ -1,14 +1,14 @@
 # coding: utf-8
 from PIL import Image
-import matplotlib.pyplot as plt
 import lake
 import  os
 import sys
 from scipy.misc import *
-from matplotlib.ticker import FuncFormatter
 import numpy as np
 
 import matplotlib as mpl
+import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
 mpl.use('Agg')
 plt.ioff()
 
