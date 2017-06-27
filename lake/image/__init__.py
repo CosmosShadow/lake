@@ -8,6 +8,9 @@ from scipy.misc import *
 from matplotlib.ticker import FuncFormatter
 import numpy as np
 
+import matplotlib as mpl
+mpl.use('Agg')
+plt.ioff()
 
 # imread
 # imsave
