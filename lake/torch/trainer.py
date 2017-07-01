@@ -88,14 +88,14 @@ class Trainer(object):
 		logging.basicConfig(
 				filename = log_path,
 				filemode = 'a',
-				level = logging.DEBUG,
+				level = logging.INFO,
 				format = format)
 
 		# 控制台输出
 		if self.log_to_console:
 			root = logging.getLogger()
 			ch = logging.StreamHandler(sys.stdout)
-			ch.setLevel(logging.DEBUG)
+			ch.setLevel(logging.INFO)
 			formatter = logging.Formatter(format)
 			ch.setFormatter(formatter)
 			root.addHandler(ch)
