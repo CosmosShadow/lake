@@ -49,8 +49,8 @@ class LoopFile:
 		return t_sum
 
 
-def loop(dir_path, extension=[]):
-	lf = LoopFile(dir_path, extension)
+def loop(root, extensions=[]):
+	lf = LoopFile(root, extensions)
 	return lf.start(lambda f: f)
 
 
