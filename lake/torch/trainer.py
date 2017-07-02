@@ -69,9 +69,9 @@ class Trainer(object):
 			option_dict = json.loads(option_json)
 			self.opt = namedtuple('X', option_dict.keys())(*option_dict.values())
 		else:
-	 = args.option if hasattr(args, 'option') else 'base'
+			option_name = args.option if hasattr(args, 'option') else 'base'
 			sys.path.append('options')
-			opt_pkg = __import__('option_' )
+			opt_pkg = __import__('option_' + option_name)
 			self.opt = opt_pkg.Options()()
 			option_json = json.dumps(vars(self.opt), indent=4)
 			lake.file.write(option_json, self._option_path)
