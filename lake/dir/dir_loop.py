@@ -30,7 +30,7 @@ class LoopFile:
 					is_exclude = True
 					break                    
 			if is_exclude:
-				continue            
+				continue
 			abs_path = os.path.join(root_dir, sub)
 			is_exclude = False
 			for exclude in self.long_exclude:
@@ -49,20 +49,8 @@ class LoopFile:
 		return t_sum
 
 
-def list_dir(dir_path, extension=[]):
+def loop(dir_path, extension=[]):
 	lf = LoopFile(dir_path, extension)
 	return lf.start(lambda f: f)
 
 
-if '__main__'==__name__:
-	root_dir = "."
-	short_exclude = ['.svn', '.*_new.rb']     ###不包含检查的短目录、文件
-	long_exclude = []                         ###不包含检查的长目录、文件
-	file_extend = ['.py']                     ###包含检查的文件类型
-	lf = loop_file(root_dir, file_extend, short_exclude, long_exclude)
-	for f in lf.start(lambda f: f):
-		print f
-
-	print "count of file with .py extention: " + str(file_count(".", [".py"]))
-
-	print list_dir('.')
