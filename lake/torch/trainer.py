@@ -53,8 +53,8 @@ class Trainer(object):
 			self.output = 'tmp'
 		self._output_dir  = './outputs/%s/' % self.output
 
-		lake.dir.check_dir('./outputs/')
-		lake.dir.check_dir(self._output_dir)
+		lake.dir.mk('./outputs/')
+		lake.dir.mk(self._output_dir)
 
 	def _load_opt(self, args):
 		"""加载option，顺序为:
