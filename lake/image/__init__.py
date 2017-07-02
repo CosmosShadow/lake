@@ -19,7 +19,6 @@ plt.ioff()
 
 IMG_EXTENSIONS = ['.jpg', '.JPG', '.jpeg', '.JPEG', '.png', '.PNG', '.ppm', '.PPM', '.bmp', '.BMP']
 
-
 def is_image_file(filename):
 	return any(filename.endswith(extension) for extension in IMG_EXTENSIONS)
 
@@ -82,6 +81,15 @@ def save_hist(data, save_path, bins=None, to_percentage=False):
 
 	fig.savefig(save_path, dpi=200)
 	plt.close('all')
+
+
+def rgb2gray(rgb):
+	return 0.2126 * rgb[..., 0] + 0.0722 * rgb[..., 1] + 0.7152 * rgb[..., 2]
+
+
+def rgb2y(rgb):
+	return 0.299 * rgb[..., 0] + 0.587 * rgb[..., 1] + 0.114 * rgb[..., 2]
+
 
 if __name__ == '__main__':
 	data = [['x', 'y', 'z'], [1, 10, 9], [2, 5, 1], [3, 9, 0]]
