@@ -72,11 +72,21 @@ class Base(nn.Module):
 	def load_network(self, save_path):
 		self.load_state_dict(torch.load(save_path))
 
-	def step_train(self, data):
-		raise NotImplementedError("not implemented in base calss")
+	def train_start(self):
+		"""训练前，模型可以完成一些初始化操作"""
+		pass
 
-	def step_test(self, data):
-		raise NotImplementedError("not implemented in base calss")
+	def train_finish(self):
+		"""训练完成"""
+		pass
+
+	def train_step(self, step, data):
+		"""训练一步"""
+		pass
+
+	def test_step(self, step, data):
+		"""测试一步"""
+		pass
 
 
 

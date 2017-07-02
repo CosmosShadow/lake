@@ -177,14 +177,6 @@ class Trainer(object):
 		if self.epoch % self.opt.print_per == 0:
 			self._epoch_log(self._epoch_records)
 		self._clear_record()
-		# 每100才记录一次
-		# if self.epoch % self.opt.print_per == 0:
-		# 	self.add_record('epoch', self.epoch)
-		# 	self.add_record('time', time.time() - self._epoch_start)
-		# 	record_json = json.dumps(self._epoch_records)
-		# 	lake.file.add_line(record_json, self.record_path)
-		# 	self._epoch_log(self._epoch_records)
-		# 	self._clear_record()
 
 	def _update_lr(self, force=False):
 		step = self.epoch - self.opt.lr_decay_start
@@ -201,10 +193,12 @@ class Trainer(object):
 
 		train_batch_count = self.data_train.count(self.opt.batch_size)
 
+		self._model.train_start()
+
 		while self.epoch <= self.opt.epochs:
 			self._model.train()
 			batch = self.data_train.next(self.opt.batch_size)
-			train_dict = self._model.step_train(self.epoch, batch)
+			train_dict = self._model.train_step(self.epoch, batch)
 			error = train_dict['loss']
 			self.optimizer.zero_grad()
 			error.backward()
@@ -227,7 +221,7 @@ class Trainer(object):
 				results = []
 				for _ in range(self.data_test.count(self.opt.batch_size)):
 					batch = self.data_test.next(self.opt.batch_size)
-					result = self._model.step_test(self.epoch, batch)
+					result = self._model.test_step(self.epoch, batch)
 					results.append(result)
 				results_average = {}
 				for key in results[0].keys():
@@ -241,4 +235,7 @@ class Trainer(object):
 			self.epoch += 1
 			self._update_lr()
 
+		self._model.save_network(self.save_path)
+		self._model.train_finish()
 		self._logger.info('train finish')
+
