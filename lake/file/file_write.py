@@ -6,7 +6,7 @@ import os
 
 
 def write(data, path):
-	lake.dir.check_dir(path)
+	lake.dir.mk(path)
 	if path.endswith('.csv'):
 		write_csv(data, path)
 	elif path.endswith('.dot'):
