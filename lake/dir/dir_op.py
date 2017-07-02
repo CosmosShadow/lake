@@ -10,7 +10,7 @@ def rm(path):
 def mk(fname):
 	dname = os.path.dirname(fname)
 	if dname not in set([".", "..", ""]):
-		if not op.path.exists(dname):
+		if not os.path.exists(dname):
 			os.makedirs(dname)
 
 def remk(path):
