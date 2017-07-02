@@ -3,7 +3,7 @@ import numpy as np
 import lake
 
 
-class TestDataChapter(object):
+class TestArray(object):
 	@classmethod
 	def setup_class(klass):
 		pass

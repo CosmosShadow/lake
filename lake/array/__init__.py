@@ -4,6 +4,7 @@ from ring_buffer import RingBuffer
 from iterator_pair import IteratorsPair
 from sample_ import *
 from count_next_interface import *
+from ring_buffer_container import *
 
 import itertools
 import random
