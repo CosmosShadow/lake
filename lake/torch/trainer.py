@@ -204,7 +204,8 @@ class Trainer(object):
 			error.backward()
 			for model in self.optimize_models:
 				for param in model.parameters():
-					param.grad.data.clamp_(-self.opt.clip_grad, self.opt.clip_grad)
+					if param.grad is not None:
+						param.grad.data.clamp_(-self.opt.clip_grad, self.opt.clip_grad)
 			self.optimizer.step()
 
 			self.add_record('loss', float(error.data[0]))

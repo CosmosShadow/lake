@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import lake
 
-def gen_cnn(n_layers, nfs, kernels, strides, pads, norm=None, last_activate=True):
+def gen_cnn(n_layers, nfs, kernels, strides, pads, pools=1, norm=None, last_activate=True):
 	"""生成CNN
 	Args:
 		n_layers : 网络层数
@@ -18,6 +18,9 @@ def gen_cnn(n_layers, nfs, kernels, strides, pads, norm=None, last_activate=True
 	kernels = lake.array.extend(kernels, n_layers)
 	strides = lake.array.extend(strides, n_layers)
 	pads = lake.array.extend(pads, n_layers)
+	pools = lake.array.extend(pools, n_layers)
+
+	print pools
 
 	sequence = []
 	for i in range(n_layers):
@@ -26,6 +29,8 @@ def gen_cnn(n_layers, nfs, kernels, strides, pads, norm=None, last_activate=True
 			sequence += [norm(nfs[i+1], affine=True)]
 		if i < n_layers - 1 or last_activate:
 			sequence += [nn.LeakyReLU(0.2, True)]
+		if pools[i] > 1:
+			sequence += [nn.MaxPool2d(pools[i])]
 	return sequence
 
 
