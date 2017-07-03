@@ -31,28 +31,34 @@ class Trainer(object):
 	def add_optimize_model(self, optimize_model):
 		self.optimize_models.append(optimize_model)
 
-	def _load(self):
+	def _parse_args(self):
 		# 解析命令行输入
 		parser = argparse.ArgumentParser()
+		parser.add_argument('--option', type=str, default='', help='option')
+		parser.add_argument('--output', type=str, default='', help='output')
 		args = parser.parse_args()
+		return args
 
+	def _load(self):
+		args = self._parse_args()
 		self._load_output_dir(args)
-		self.save_path = self._output_dir + 'checkpoint.pth'
-		self.record_path = self._output_dir + 'record.txt'
-
 		self._load_opt(args)
+
+		self.record_path = self._output_dir + 'record.txt'
+		self.save_path = self._output_dir + 'checkpoint.pth'
+
 		self._set_gpu()
 		self._config_logging()
 		self._load_epoch()
 
 	def _load_output_dir(self, args):
-		# 确定输出目录，默认 tmp
-		if hasattr(args, 'output'):
+		# 确定输出目录，默认起一个时间
+		if len(args.output) > 0:
 			self.output = args.output
 		else:
-			self.output = 'tmp'
-		self._output_dir  = './outputs/%s/' % self.output
+			self.output = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
 
+		self._output_dir  = './outputs/%s/' % self.output
 		lake.dir.mk('./outputs/')
 		lake.dir.mk(self._output_dir)
 
@@ -69,7 +75,7 @@ class Trainer(object):
 			option_dict = json.loads(option_json)
 			self.opt = namedtuple('X', option_dict.keys())(*option_dict.values())
 		else:
-			option_name = args.option if hasattr(args, 'option') else 'base'
+			option_name = args.option if len(args.option) > 0 else 'base'
 			sys.path.append('options')
 			opt_pkg = __import__('option_' + option_name)
 			self.opt = opt_pkg.Options()()
@@ -109,6 +115,7 @@ class Trainer(object):
 	@model.setter
 	def model(self, value):
 		self._model = value
+		self._model.output_dir = self._output_dir
 		try:
 			self._model.load_network(self.save_path)
 			self._logger.info('load network success')

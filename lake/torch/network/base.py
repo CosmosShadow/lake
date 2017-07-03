@@ -10,6 +10,7 @@ class Base(nn.Module):
 		super(Base, self).__init__()
 		self.gpu_ids = gpu_ids or lake.torch.network.get_default_gpu_ids()
 		self.model = None
+		self.output_dir = None		#保存地址，model可往目录写东西
 		if len(self.gpu_ids) > 0:
 			assert(torch.cuda.is_available())
 
