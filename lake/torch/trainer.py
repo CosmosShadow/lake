@@ -36,7 +36,7 @@ class Trainer(object):
 		parser = argparse.ArgumentParser()
 		parser.add_argument('--option', type=str, default='', help='option')
 		parser.add_argument('--output', type=str, default='', help='output')
-		args = parser.parse_args()
+		args, unknown = parser.parse_known_args()
 		return args
 
 	def _load(self):
