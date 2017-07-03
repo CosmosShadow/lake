@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import lake
 
-def gen_cnn(n_layers, nfs, kernels, strides, pads, pools=1, norm=None, last_activate=True):
+def gen_cnn(n_layers, nfs, kernels, strides, pads, pools=1, norm=nn.BatchNorm2d, last_activate=True):
 	"""生成CNN
 	Args:
 		n_layers : 网络层数
@@ -34,7 +34,7 @@ def gen_cnn(n_layers, nfs, kernels, strides, pads, pools=1, norm=None, last_acti
 	return sequence
 
 
-def gen_cnn_transpose(n_layers, nfs, kernels, strides, pads, norm=None, last_activate=True):
+def gen_cnn_transpose(n_layers, nfs, kernels, strides, pads, norm=nn.BatchNorm2d, last_activate=True):
 	"""生成反向CNN
 	Args:
 		n_layers : 网络层数
