@@ -20,8 +20,6 @@ def gen_cnn(n_layers, nfs, kernels, strides, pads, pools=1, norm=nn.BatchNorm2d,
 	pads = lake.array.extend(pads, n_layers)
 	pools = lake.array.extend(pools, n_layers)
 
-	print pools
-
 	sequence = []
 	for i in range(n_layers):
 		sequence += [nn.Conv2d(nfs[i], nfs[i+1], kernel_size=kernels[i], stride=strides[i], padding=pads[i])]
