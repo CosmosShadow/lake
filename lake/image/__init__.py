@@ -60,20 +60,25 @@ def clear_dir(images_dir):
 			os.remove(image_path)
 
 
-def save_hist(data, save_path, bins=None, to_percentage=False):
+def save_hist(data, save_path, bins=None, to_percentage=False, xlabel=None, ylabel=None):
 	"""保存成直方图
 	Args:
 		data : numpy
 		bins: like np.linspace(0, 200, 201)
 	"""
+	if (xlabel is None) or (ylabel is None):
+		xlabel = 'x'
+		ylabel = 'y'
+
 	if bins is None:
 		bins = np.linspace(data.min(), data.max()+1, 100)
+
 	fig = plt.gcf()
 	plt.hist(data, bins=bins, alpha=0.5, label='num', color='red')
 	plt.legend(loc='upper right')
 	plt.xlim(0,len(bins)-1)
-	plt.xlabel('x')
-	plt.ylabel('y')
+	plt.xlabel(xlabel)
+	plt.ylabel(ylabel)
 
 	if to_percentage:
 		to_percentage = lambda y, pos: str(round( ( y / float(len(data)) ) * 100.0, 2)) + '%'
