@@ -32,7 +32,7 @@ def rotate_with_background(img, angel, bg=(255,)*4):
 	Args:
 		img: PIL image
 		angel: rotate angel
-		bg: background
+		bg: background, can be gray value or RGBA
 	Returns:
 		rotated image
 	"""
