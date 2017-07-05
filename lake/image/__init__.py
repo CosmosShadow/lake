@@ -47,7 +47,7 @@ def csv_to_image(data, save_path, dpi=200):
 
 def clear_dir(images_dir):
 	"""清理目录下破损图片"""
-	images_path = lake.file.list_dir(images_dir, IMG_EXTENSIONS)
+	images_path = lake.dir.loop(images_dir, IMG_EXTENSIONS)
 	count = len(images_path)
 	for i, image_path in enumerate(images_path):
 		sys.stdout.write('\r%d/%d' % (i, count))
