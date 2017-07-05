@@ -224,18 +224,25 @@ class Trainer(object):
 				self._model.save_network(self.save_path)
 				self.add_record('save', 1)
 
-			if self.epoch % train_batch_count == 0 and self.data_test is not None:
+			if self.epoch % train_batch_count == 0:
 				self._model.eval()
-				results = []
-				for _ in range(self.data_test.count(self.opt.batch_size)):
-					batch = self.data_test.next(self.opt.batch_size)
-					result = self._model.test_step(self.epoch, batch)
-					results.append(result)
-				results_average = {}
-				for key in results[0].keys():
-					results_average['test_' + key] = np.mean([item[key] for item in results])
-				self.add_records(results_average)
-				self._epoch_log(results_average)
+				if self.data_test is not None:
+					results = []
+					for _ in range(self.data_test.count(self.opt.batch_size)):
+						batch = self.data_test.next(self.opt.batch_size)
+						result = self._model.test_step(self.epoch, batch)
+						results.append(result)
+					results_average = {}
+					for key in results[0].keys():
+						results_average['test_' + key] = np.mean([item[key] for item in results])
+					self.add_records(results_average)
+					self._epoch_log(results_average)
+				else:
+					result = self._model.test_step(self.epoch, None)
+					if result is not None:
+						results = dict(zip(['test_' + key for key in result.keys()], result.values()))
+						self.add_records(result)
+						self._epoch_log(result)
 
 			self._run_hook()
 			self._store_record()
