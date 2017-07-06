@@ -240,7 +240,7 @@ class Trainer(object):
 				else:
 					result = self._model.test_step(self.epoch, None)
 					if result is not None:
-						results = dict(zip(['test_' + key for key in result.keys()], result.values()))
+						result = dict(zip(['test_' + key for key in result.keys()], result.values()))
 						self.add_records(result)
 						self._epoch_log(result)
 
