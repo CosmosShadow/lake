@@ -6,6 +6,7 @@ import sys
 import numpy as np
 import collections
 
+IMG_EXTENSIONS = ['.jpg', '.JPG', '.jpeg', '.JPEG', '.png', '.PNG', '.ppm', '.PPM', '.bmp', '.BMP']
 
 def open_image(path):
 	"""打开图片"""
