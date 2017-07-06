@@ -19,7 +19,7 @@ class NNOptions(Options):
 		self.parser.add_argument('--lr_decay_start', type=int, default=0, help='weight of nn decay')
 		self.parser.add_argument('--lr_decay_per', type=int, default=1e4, help='weight of nn decay')
 
-		self.parser.add_argument('--option', type=str, default='', help='only placeholder')
+		self.parser.add_argument('--option', type=str, default='base', help='only placeholder')
 		self.parser.add_argument('--output', type=str, default='', help='only placeholder')
 
 		self.parser.add_argument('--save_per', type=int, default=1e4, help='save interval')
