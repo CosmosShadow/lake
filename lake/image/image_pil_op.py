@@ -13,13 +13,14 @@ def open_image(path):
 	return Image.open(path).convert('RGB')
 
 
-def clear_dir(images_dir):
+def clear_dir(images_dir, debug = True):
 	"""清理目录下破损图片"""
 	images_path = lake.dir.loop(images_dir, IMG_EXTENSIONS)
 	count = len(images_path)
 	for i, image_path in enumerate(images_path):
-		sys.stdout.write('\r%d/%d' % (i, count))
-		sys.stdout.flush()
+		if debug:
+			sys.stdout.write('\r%d/%d' % (i, count))
+			sys.stdout.flush()
 		try:
 			open_image(image_path)
 		except Exception as e:

@@ -1,3 +1,4 @@
 lake.egg-info/*
 dist/*
 *.pyc
+build/*
