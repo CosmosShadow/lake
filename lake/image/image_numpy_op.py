@@ -36,7 +36,7 @@ def csv_to_image(data, save_path, dpi=200):
 	fig.savefig(save_path, dpi=dpi)
 
 
-def save_hist(data, save_path, bins=None, to_percentage=False, xlabel=None, ylabel=None):
+def save_hist(data, save_path, bins=None, to_percentage=False, xlabel=None, ylabel=None, title=None):
 	"""保存成直方图
 	Args:
 		data : numpy
@@ -49,10 +49,13 @@ def save_hist(data, save_path, bins=None, to_percentage=False, xlabel=None, ylab
 	if bins is None:
 		bins = np.linspace(data.min(), data.max()+1, 100)
 
+	if title is None:
+		title = 'Hist Figure'
 	fig = plt.gcf()
 	plt.hist(data, bins=bins, alpha=0.5, label='num', color='red')
 	plt.legend(loc='upper right')
 	plt.xlim(0,len(bins)-1)
+	plt.title(title)
 	plt.xlabel(xlabel)
 	plt.ylabel(ylabel)
 
