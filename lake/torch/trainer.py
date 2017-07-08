@@ -120,6 +120,7 @@ class Trainer(object):
 			self._model.load_network(self.save_path)
 			self._logger.info('load network success')
 		except Exception as e:
+			print e
 			self._logger.info('load network fail')
 			self.epoch = 1
 
@@ -236,13 +237,15 @@ class Trainer(object):
 					for key in results[0].keys():
 						results_average['test_' + key] = np.mean([item[key] for item in results])
 					self.add_records(results_average)
-					self._epoch_log(results_average)
+					if self.epoch % self.opt.print_per != 0:
+						self._epoch_log(results_average)
 				else:
 					result = self._model.test_step(self.epoch, None)
 					if result is not None:
 						result = dict(zip(['test_' + key for key in result.keys()], result.values()))
 						self.add_records(result)
-						self._epoch_log(result)
+						if self.epoch % self.opt.print_per != 0:
+							self._epoch_log(result)
 
 			self._run_hook()
 			self._store_record()
