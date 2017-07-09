@@ -1,4 +1,5 @@
 # coding: utf-8
+from nose.tools import *
 import numpy as np
 import lake
 
@@ -30,3 +31,25 @@ class TestRingBufferContainer(object):
 			assert isinstance(x[i], int)
 			assert isinstance(y[i], int)
 			assert len(z[i]) == 2
+
+	def test_content(self):
+		container = lake.array.RingBufferContainer(10, 4, [(-3, 5), 1, 1, 1])
+		for x in xrange(1, 6):
+			container.append([x]*4)
+		a, b, c, d = container.next(1)
+		assert_equal(a, [[1, 2, 3, 4, 5]])
+		assert_equal(b, [4])
+		assert_equal(c, [4])
+		assert_equal(d, [4])
+
+
+if __name__ == '__main__':
+	TestRingBufferContainer().test_content()
+
+
+
+
+
+
+
+

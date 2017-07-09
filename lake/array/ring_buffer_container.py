@@ -5,7 +5,13 @@ from sample_ import sample_in_range
 
 
 class RingBufferContainer(CountNextInterface):
-	"""RingBuffer容器，管理多个循环缓存"""
+	"""RingBuffer容器，管理多个循环缓存
+	-----------------------------------------------------Waring-----------------------------------------------------------
+	read_masks: [(-3, 5), 1, 1, 1]
+	如果长度只有5，且每个元素等于位置，则
+	返回的是([[1, 2, 3, 4, 5]], [4], [4], [4])
+	-----------------------------------------------------Waring-----------------------------------------------------------
+	"""
 	def __init__(self, max_len, buffer_count, read_masks=None):
 		"""初始化
 		Args:
@@ -29,7 +35,10 @@ class RingBufferContainer(CountNextInterface):
 			self._datas[i].append(value)
 
 	def _format_read_masks(self, read_masks):
-		"""根据读取的mask，解析能够采样数据的范围"""
+		"""根据读取的mask，解析能够采样数据的范围
+		return:
+			sample_range: (start, end)，不包含结尾
+		"""
 		new_masks = []
 		for read_mask in read_masks:
 			if isinstance(read_mask, int):
@@ -41,8 +50,8 @@ class RingBufferContainer(CountNextInterface):
 			else:
 				raise ValueError('read musk is not int or tuple of 2')
 		begin_offset = min([begin for begin, end in new_masks])
-		end_offset = min([end for begin, end in new_masks])
-		sample_range = (max(0, -begin_offset), min(len(self), len(self) - end_offset))
+		end_offset = max([end for begin, end in new_masks])
+		sample_range = (max(0, -begin_offset), min(len(self), len(self) - end_offset + 1))
 		return sample_range, new_masks
 
 	def next(self, batch_size, read_masks=None):
