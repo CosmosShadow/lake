@@ -193,6 +193,28 @@ class Trainer(object):
 			for param_group in self.optimizer.param_groups:
 				param_group['lr'] = self.current_lr
 
+	def _test(self):
+		self._model.eval()
+		if self.data_test is not None:
+			results = []
+			for _ in range(self.data_test.count(self.opt.batch_size)):
+				batch = self.data_test.next(self.opt.batch_size)
+				result = self._model.test_step(self.epoch, batch)
+				results.append(result)
+			results_average = {}
+			for key in results[0].keys():
+				results_average['test_' + key] = np.mean([item[key] for item in results])
+			self.add_records(results_average)
+			if self.epoch % self.opt.print_per != 0:
+				self._epoch_log(results_average)
+		else:
+			result = self._model.test_step(self.epoch, None)
+			if result is not None:
+				result = dict(zip(['test_' + key for key in result.keys()], result.values()))
+				self.add_records(result)
+				if self.epoch % self.opt.print_per != 0:
+					self._epoch_log(result)
+
 	def train(self):
 		self._check_train_components()
 		self._update_lr(force=True)
@@ -204,6 +226,9 @@ class Trainer(object):
 		self._model.train_start()
 
 		while self.epoch <= self.opt.epochs:
+			if self.epoch % train_batch_count == 0:
+				self._test()
+
 			self._model.train()
 			batch = self.data_train.next(self.opt.batch_size)
 			train_dict = self._model.train_step(self.epoch, batch)
@@ -224,28 +249,6 @@ class Trainer(object):
 			if self.epoch % self.opt.save_per == 0:
 				self._model.save_network(self.save_path)
 				self.add_record('save', 1)
-
-			if self.epoch % train_batch_count == 0:
-				self._model.eval()
-				if self.data_test is not None:
-					results = []
-					for _ in range(self.data_test.count(self.opt.batch_size)):
-						batch = self.data_test.next(self.opt.batch_size)
-						result = self._model.test_step(self.epoch, batch)
-						results.append(result)
-					results_average = {}
-					for key in results[0].keys():
-						results_average['test_' + key] = np.mean([item[key] for item in results])
-					self.add_records(results_average)
-					if self.epoch % self.opt.print_per != 0:
-						self._epoch_log(results_average)
-				else:
-					result = self._model.test_step(self.epoch, None)
-					if result is not None:
-						result = dict(zip(['test_' + key for key in result.keys()], result.values()))
-						self.add_records(result)
-						if self.epoch % self.opt.print_per != 0:
-							self._epoch_log(result)
 
 			self._run_hook()
 			self._store_record()
