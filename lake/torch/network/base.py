@@ -8,6 +8,8 @@ import lake.torch
 class Base(nn.Module):
 	def __init__(self, gpu_ids=None):
 		super(Base, self).__init__()
+		# 默认不使用内部优化器, trainer会生成optimizer
+		self.use_inner_optimizer = False
 		self.gpu_ids = gpu_ids or lake.torch.network.get_default_gpu_ids()
 		self.model = None
 		self.output_dir = None		#保存地址，model可往目录写东西

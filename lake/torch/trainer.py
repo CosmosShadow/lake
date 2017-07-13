@@ -22,14 +22,10 @@ class Trainer(object):
 		self.data_train = None
 		self.data_test = None
 		self._model = None
-		self.optimize_models = []
 		self.optimizer = None
 		self.hooks = []
 		self._load()
-		self._clear_record()
-
-	def add_optimize_model(self, optimize_model):
-		self.optimize_models.append(optimize_model)
+		self._reset_record()
 
 	def _parse_args(self):
 		# 解析命令行输入
@@ -133,17 +129,14 @@ class Trainer(object):
 
 	def _check_train_components(self):
 		"""检测训练要素"""
-		assert self.data_train is not None
 		assert self._model is not None
 		self._logger.info(self._model)
-		if self.optimizer is None:
-			if len(self.optimize_models) > 0:
-				self.optimizer = torch.optim.Adam(itertools.chain((model.parameters for model in self.optimize_models)), 
-				                                  lr=self.opt.lr, weight_decay=self.opt.weight_decay)
-			else:
-				self.optimizer = torch.optim.Adam(self._model.model.parameters(), 
-				                                  lr=self.opt.lr, weight_decay=self.opt.weight_decay)
-				self.optimize_models.append(self._model.model)
+		if self.optimizer is None and not self._model.use_inner_optimizer:
+			self.optimizer = torch.optim.Adam(
+					self._model.model.parameters(),
+					lr=self.opt.lr,
+					weight_decay=self.opt.weight_decay)
+			self.optimize_models.append(self._model.model)
 
 	def add_hook(self, interval=1, fun=None):
 		"""添加钩子: 训练过程中，间隔interval执行fun函数"""
@@ -155,7 +148,7 @@ class Trainer(object):
 			if self.epoch % interval == 0:
 				fun()
 
-	def _clear_record(self):
+	def _reset_record(self):
 		self._epoch_records = {}
 		self._epoch_start = time.time()
 
@@ -184,17 +177,17 @@ class Trainer(object):
 		lake.file.add_line(record_json, self.record_path)
 		if self.epoch % self.opt.print_per == 0:
 			self._epoch_log(self._epoch_records)
-		self._clear_record()
+		self._reset_record()
 
 	def _update_lr(self, force=False):
-		step = self.epoch - self.opt.lr_decay_start
-		if force or (step > 0 and step % self.opt.lr_decay_per == 0):
-			self.current_lr = self.opt.lr * (self.opt.lr_decay ** (step / self.opt.lr_decay_per))
-			for param_group in self.optimizer.param_groups:
-				param_group['lr'] = self.current_lr
+		if self.optimizer is not None:
+			step = self.epoch - self.opt.lr_decay_start
+			if force or (step > 0 and step % self.opt.lr_decay_per == 0):
+				self.current_lr = self.opt.lr * (self.opt.lr_decay ** (step / self.opt.lr_decay_per))
+				for param_group in self.optimizer.param_groups:
+					param_group['lr'] = self.current_lr
 
 	def _test(self):
-		self._model.eval()
 		if self.data_test is not None:
 			results = []
 			for _ in range(self.data_test.count(self.opt.batch_size)):
@@ -215,30 +208,20 @@ class Trainer(object):
 				if self.epoch % self.opt.print_per != 0:
 					self._epoch_log(result)
 
-	def train(self):
-		self._check_train_components()
-		self._update_lr(force=True)
 
-		self._logger.info('train start')
+	def _train(self):
+		batch = self.data_train.next(self.opt.batch_size) if self.data_train is not None else None
+		train_dict = self._model.train_step(self.epoch, batch)
 
-		train_batch_count = self.data_train.count(self.opt.batch_size)
-
-		self._model.train_start()
-
-		while self.epoch <= self.opt.epochs:
-			if self.epoch % train_batch_count == 0:
-				self._test()
-
-			self._model.train()
-			batch = self.data_train.next(self.opt.batch_size)
-			train_dict = self._model.train_step(self.epoch, batch)
+		if self.optimizer is None:
+			self.add_records(train_dict)
+		else:
 			error = train_dict['loss']
 			self.optimizer.zero_grad()
 			error.backward()
-			for model in self.optimize_models:
-				for param in model.parameters():
-					if param.grad is not None:
-						param.grad.data.clamp_(-self.opt.clip_grad, self.opt.clip_grad)
+			for param in self._model.model.parameters():
+				if param.grad is not None:
+					param.grad.data.clamp_(-self.opt.clip_grad, self.opt.clip_grad)
 			self.optimizer.step()
 
 			self.add_record('loss', float(error.data[0]))
@@ -246,15 +229,31 @@ class Trainer(object):
 				if key != 'loss':
 					self.add_record(key, value)
 
+
+	def train(self):
+		self._check_train_components()
+		self._update_lr(force=True)
+		self._logger.info('train start')
+		self._model.train_start()
+
+		while self.epoch <= self.opt.epochs:
+			if self.data_train is not None:
+				train_batch_count = self.data_train.count(self.opt.batch_size)
+				if self.epoch % train_batch_count == 0:
+					self._model.eval()
+					self._test()
+
+			self._model.train()
+			self._train()
+
 			if self.epoch % self.opt.save_per == 0:
 				self._model.save_network(self.save_path)
 				self.add_record('save', 1)
 
 			self._run_hook()
 			self._store_record()
-
-			self.epoch += 1
 			self._update_lr()
+			self.epoch += 1
 
 		self._model.save_network(self.save_path)
 		self._model.train_finish()
