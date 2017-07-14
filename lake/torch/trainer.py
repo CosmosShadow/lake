@@ -136,7 +136,6 @@ class Trainer(object):
 					self._model.model.parameters(),
 					lr=self.opt.lr,
 					weight_decay=self.opt.weight_decay)
-			self.optimize_models.append(self._model.model)
 
 	def add_hook(self, interval=1, fun=None):
 		"""添加钩子: 训练过程中，间隔interval执行fun函数"""
@@ -171,7 +170,8 @@ class Trainer(object):
 
 	def _store_record(self):
 		self.add_record('epoch', self.epoch)
-		self.add_record('lr', self.current_lr)
+		if hasattr(self, 'current_lr'):
+			self.add_record('lr', self.current_lr)
 		self.add_record('time', time.time() - self._epoch_start)
 		record_json = json.dumps(self._epoch_records)
 		lake.file.add_line(record_json, self.record_path)
