@@ -219,9 +219,8 @@ class Trainer(object):
 			error = train_dict['loss']
 			self.optimizer.zero_grad()
 			error.backward()
-			for param in self._model.model.parameters():
-				if param.grad is not None:
-					param.grad.data.clamp_(-self.opt.clip_grad, self.opt.clip_grad)
+			if self.opt.clip_grad_norm > 0:
+				torch.nn.utils.clip_grad_norm(self.model.parameters(), self.opt.clip_grad_norm)
 			self.optimizer.step()
 
 			self.add_record('loss', float(error.data[0]))
