@@ -17,6 +17,19 @@ def to_dict(data):
 		result[k].append(v)
 	return result
 
+
+def to_raw_dict(data):
+	"""数组转字典，字典元素为数组
+	Args:
+		data: [arr, arr, ...]
+	Returns:
+		{arr[0]: [arr, arr, ...], ...}
+	"""
+	result = defaultdict(list)
+	for item in data:
+		result[item[0]].append(item)
+	return result
+
 def extend(values, count, value=None):
 	"""扩展
 	Args:

@@ -4,6 +4,7 @@ import network
 import string
 # import torch
 import image
+import dic
 import dir
 import file
 import array
