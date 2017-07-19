@@ -1,6 +1,6 @@
 # coding: utf-8
 
-def reverse_list(values):
+def reverse_list_v(values):
 	"""反转dict, dict中的元素为数组
 	Args:
 		values: {k1: [v1, v2, ...], ...}
