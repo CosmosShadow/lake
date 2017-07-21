@@ -3,7 +3,7 @@ from base import *
 from unet import *
 from cnn import *
 from instance_normalization import *
-from lake.decorator.singleton import singleton
+from lake.decorator import singleton
 
 
 @singleton
