@@ -1,6 +1,5 @@
 # coding: utf-8
 import csv
-import codecs
 import lake
 import json
 import os
@@ -30,7 +29,6 @@ def write_txt(data, path):
 
 def write_csv(data, path):
 	with file(path, 'wb') as csvfile:
-		csvfile.write(codecs.BOM_UTF8)
 		writer = csv.writer(csvfile)
 		for row in data:
 			writer.writerow(row)
