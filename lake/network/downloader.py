@@ -8,7 +8,9 @@ from six.moves import queue as Queue
 from threading import Thread
 import re
 import ssl
-import urllib2
+import shutil
+
+
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -34,10 +36,12 @@ class _download_thread(Thread):
 			retry_times = 0
 			while retry_times < self.retry:
 				try:
-					data = urllib2.urlopen(url).read()
-					with open(save_path,'wb') as f:
-						f.write(data)
-					break
+					r = requests.get(url, stream=True)
+					if r.status_code == 200:
+						with open(save_path, 'wb') as f:
+							r.raw.decode_content = True
+							shutil.copyfileobj(r.raw, f)
+							break
 				except Exception as e:
 					print(e)
 				retry_times += 1
