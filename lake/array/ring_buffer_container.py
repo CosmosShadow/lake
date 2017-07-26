@@ -1,7 +1,9 @@
 # coding: utf-8
-from ring_buffer import RingBuffer
-from count_next_interface import CountNextInterface
-from sample_ import sample_in_range
+from __future__ import absolute_import
+from __future__ import print_function
+from .ring_buffer import RingBuffer
+from .count_next_interface import CountNextInterface
+from .sample_ import sample_in_range
 
 
 class RingBufferContainer(CountNextInterface):

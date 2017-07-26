@@ -1,6 +1,8 @@
 # coding: utf-8
+from __future__ import absolute_import
+from __future__ import print_function
 import numpy as np
-from count_next_interface import *
+from .count_next_interface import *
 
 class Shuffler(CountNextInterface):
 	def __init__(self, *datas):

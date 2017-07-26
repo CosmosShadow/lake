@@ -1,4 +1,6 @@
 # coding: utf-8
+from __future__ import absolute_import
+from __future__ import print_function
 import os
 import sys
 import json
@@ -9,7 +11,7 @@ import logging
 import numpy as np
 from collections import namedtuple
 import time
-import network as torch_network
+from . import network as torch_network
 
 
 class Trainer(object):
