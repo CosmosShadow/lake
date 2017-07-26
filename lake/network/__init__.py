@@ -1,3 +1,4 @@
 # coding: utf-8
-from downloader import download
-import proxy
+from __future__ import absolute_import
+from .downloader import download
+from . import proxy

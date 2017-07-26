@@ -1,14 +1,14 @@
 # coding: utf-8
-import decorator
-import network
-import string
-# import torch
-import image
-import dic
-import dir
-import file
-import array
-import np
-import option
-import mt
-import tm
+from __future__ import absolute_import
+from . import decorator
+from . import network
+from . import string
+from . import image
+from . import dic
+from . import dir
+from . import file
+from . import array
+from . import np
+from . import option
+from . import mt
+from . import tm

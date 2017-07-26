@@ -1,8 +1,9 @@
 # coding: utf-8
-from base import *
-from unet import *
-from cnn import *
-from instance_normalization import *
+from __future__ import absolute_import
+from .base import *
+from .unet import *
+from .cnn import *
+from .instance_normalization import *
 from lake.decorator import singleton
 
 

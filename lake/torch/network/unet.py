@@ -2,7 +2,7 @@
 import torch
 import torch.nn as nn
 import lake
-from lake.torch.network.base import Base
+from .base import Base
 
 
 class Unet(Base):

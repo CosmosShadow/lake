@@ -1,3 +1,5 @@
-import network
-import optim
-from trainer import *
+# coding: utf-8
+from __future__ import absolute_import
+from . import network
+from . import optim
+from .trainer import *

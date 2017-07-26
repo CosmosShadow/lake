@@ -1,2 +1,3 @@
 # coding: utf-8
-from dic_op import *
+from __future__ import absolute_import
+from .dic_op import *

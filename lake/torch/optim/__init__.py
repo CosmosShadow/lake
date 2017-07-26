@@ -1,2 +1,3 @@
 # coding: utf-8
-from shared_adam import *
+from __future__ import absolute_import
+from .shared_adam import *

@@ -1,2 +1,3 @@
 # coding: utf-8
-from loss import *
+from __future__ import absolute_import
+from .loss import *

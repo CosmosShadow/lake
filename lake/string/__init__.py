@@ -1,5 +1,6 @@
 # coding: utf-8
-import color
+from __future__ import absolute_import
+from . import color
 
 def humman(value):
 	for unit in ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']:
