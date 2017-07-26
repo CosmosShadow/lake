@@ -116,7 +116,7 @@ class Trainer(object):
 			self._model.load_network(self.save_path)
 			self._logger.info('load network success')
 		except Exception as e:
-			print e
+			print(e)
 			self._logger.info('load network fail')
 			self.epoch = 1
 

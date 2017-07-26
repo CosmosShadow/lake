@@ -39,7 +39,7 @@ class _download_thread(Thread):
 						f.write(data)
 					break
 				except Exception as e:
-					print e
+					print(e)
 				retry_times += 1
 			else:
 				try:
@@ -69,7 +69,7 @@ class _downloader(object):
 			self.queue.put((item[0], item[1]))
 		self.queue.join()
 
-		print 'finish'
+		print('finish')
 
 
 def download(download_list, thread_count = 10, timeout = 10, retry = 5):

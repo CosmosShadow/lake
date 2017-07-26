@@ -21,7 +21,3 @@ def zero_like(data):
 		return 0.
 
 
-if __name__ == '__main__':
-	print one_hot(10, 1)
-	print zero_like([1, [2, 3], np.array([4, 5])])
-

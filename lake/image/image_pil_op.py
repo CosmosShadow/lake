@@ -24,8 +24,8 @@ def clear_dir(images_dir, debug = True):
 		try:
 			open_image(image_path)
 		except Exception as e:
-			print image_path
-			print ''
+			print(image_path)
+			print('')
 			os.remove(image_path)
 
 
