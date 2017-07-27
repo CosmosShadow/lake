@@ -1,4 +1,7 @@
 # coding: utf-8
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import division
 
 def continue_divide(value, div, max_left=1):
 	"""连续除"""
@@ -10,6 +13,6 @@ def continue_divide(value, div, max_left=1):
 	ex = 0
 	left = value
 	while left > max_left:
-		left = left / div
+		left = left // div
 		ex += 1
 	return ex, left
