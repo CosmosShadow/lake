@@ -3,6 +3,9 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import division
 
-from .decorator_singleton import *
-from .decorator_time import *
-from .decorator_args import *
+
+import sys
+if sys.version > '3':
+	from functools import lru_cache
+else:
+	from repoze.lru import lru_cache
