@@ -54,7 +54,7 @@ def save_hist(data, save_path, bins=None, to_percentage=False, xlabel=None, ylab
 	fig = plt.gcf()
 	plt.hist(data, bins=bins, alpha=0.5, label='num', color='red')
 	plt.legend(loc='upper right')
-	plt.xlim(0,len(bins)-1)
+	plt.xlim(data.min(), data.max())
 	plt.title(title)
 	plt.xlabel(xlabel)
 	plt.ylabel(ylabel)
