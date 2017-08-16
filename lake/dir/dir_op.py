@@ -5,7 +5,7 @@ import shutil
 
 def rm(path):
 	if os.path.exists(path):
-		shutil.remove(path)
+		shutil.rmtree(path)
 
 def mk(fname):
 	dname = os.path.dirname(fname)
