@@ -80,3 +80,14 @@ def split_with_length(data, length, step=None, fix_length=False):
 			stop_index = min(index + length, len(data))
 			arr.append(data[index: stop_index])
 	return arr
+
+
+def categorize(arr, index=0):
+	# 根据第index个元素，分类数组的数组
+	assert isinstance(arr, Iterable)
+	results = defaultdict(list)
+	for record in arr:
+		assert 0 <= index < len(record)
+		results[record[index]].append(record)
+	return results
+

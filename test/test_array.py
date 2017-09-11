@@ -52,6 +52,15 @@ class TestArray(object):
 		for item in data(2):
 			assert_equal(len(item[0]), 2)
 
+	def test_categorize(self):
+		data = [[1, 2, 3], [1, 2], [2, 5], [3, 4]]
+		result = lake.array.categorize(data)
+		assert_equal(result, {1: [[1, 2, 3], [1, 2]], 2: [[2, 5]], 3: [[3, 4]]})
+
+
+if __name__ == '__main__':
+	TestArray().test_categorize()
+
 
 
 
