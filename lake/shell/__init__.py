@@ -17,7 +17,7 @@ class Shell(object):
 		self._sleep = sleep or 1	#起码等待1s
 		
 	def __enter__(self):
-		print('Shell enter: ', self._cmd)
+		# print('Shell enter: ', self._cmd)
 		self.pro = subprocess.Popen(self._cmd, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
 		time.sleep(self._sleep)
 
@@ -30,7 +30,7 @@ class Shell(object):
 			print(output)
 		elif self._out is not None:
 			lake.file.write(output, self._out)
-		print('Shell exit: ', self._cmd)
+		# print('Shell exit: ', self._cmd)
 
 
 class MC(object):
@@ -40,15 +40,16 @@ class MC(object):
 		self._cmd = 'memcached -d -m %s -p %d' % (size, port)
 
 	def __enter__(self):
-		print('memcache start: ', self._cmd)
+		# print('memcache start: ', self._cmd)
 		os.system(self._cmd)
 		time.sleep(1)			#等待启动完成
 
 	def __exit__(self, exc_type, exc_value, exc_tb):
 		cmd = '''ps -ef | grep '%s' | awk '{print $2}' | xargs kill -9''' % self._cmd
 		os.system(cmd)
-		print('memcache stop: ', self._cmd)
+		# print('memcache stop: ', self._cmd)
 
 
 def run(cmd):
-	os.system(cmd)
+	output = os.popen(cmd)
+	return output.read()
