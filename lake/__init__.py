@@ -14,3 +14,4 @@ from . import option
 from . import mt
 from . import tm
 from . import shell
+from . import nlp
