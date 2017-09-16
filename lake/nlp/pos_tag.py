@@ -3,7 +3,16 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import division
 
+# 相关参考
+# 中文词性 http://repository.upenn.edu/cgi/viewcontent.cgi?article=1039&context=ircs_reports
+
 tag_names = dict([
+('DT', '确定词(这,那,该,每)'),
+('CD', '概数词(好些,半,许多)'),
+('VD', '序列词(第十)'),
+('JJ', '介词(Adjective)'),
+('JJR', 'Adjective, comparative'),
+('JJS', 'Adjective, superlative'),
 ('''NN''', u'名词'),
 ('''NNP''', u'专用名词的单数形式'),
 ('''NNPS''', u'专用名词的复数形式'),
@@ -18,6 +27,10 @@ tag_names = dict([
 ('''SYM''', u'符号（数学符号或特殊符号）|'),
 ('''TO''', u'To'),
 ('''UH''', u'叹词'),
+('''VA''', u'动词'),
+('''VC''', u'动词'),
+('''VE''', u'动词'),
+('''VV''', u'动词'),
 ('''VB''', u'动词的基本形式'),
 ('''VBD''', u'动词的过去式'),
 ('''VBG''', u'动词的动名词用法'),
