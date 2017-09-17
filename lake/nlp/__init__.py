@@ -5,3 +5,4 @@ from __future__ import division
 
 
 from .pos_tag import *
+from .nltk_ import *
