@@ -5,6 +5,7 @@ from __future__ import division
 
 # 相关参考
 # 中文词性 http://repository.upenn.edu/cgi/viewcontent.cgi?article=1039&context=ircs_reports
+# TODO: http://blog.csdn.net/eli00001/article/details/75088444
 
 tag_names = dict([
 ('DT', '确定词(这,那,该,每)'),
