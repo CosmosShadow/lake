@@ -9,7 +9,7 @@ def write(data, path):
 	lake.dir.mk(path)
 	if path.endswith('.csv'):
 		write_csv(data, path)
-	elif path.endswith('.dot'):
+	elif path.endswith('.dot') and isinstance(data, list):
 		write_dot(data, path)
 	else:
 		write_txt(data, path)
