@@ -51,5 +51,11 @@ class MC(object):
 
 
 def run(cmd):
+	"""运行返回结果"""
 	output = os.popen(cmd)
 	return output.read()
+
+
+def call(cmd):
+	"""运行不返回结果"""
+	os.system(cmd)
