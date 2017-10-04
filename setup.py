@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
 	name = 'lake',
-	version = '0.0.1',
+	version = '0.0.2',
 	keywords = ('lake'),
 	description = 'a python lib for network, file, and something else',
 	license = 'MIT License',
