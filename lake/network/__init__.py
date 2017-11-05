@@ -8,6 +8,7 @@ import requests
 
 def download_file(url, save_path):
 	"""下载文件: 主要是大文件，流式下载"""
+	chunk_size = 128
 	r = requests.get(url, stream=True)
 	with open(save_path, 'wb') as fd:
 		for chunk in r.iter_content(chunk_size):
