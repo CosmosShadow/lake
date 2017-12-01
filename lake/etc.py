@@ -4,12 +4,13 @@ from __future__ import print_function
 from __future__ import division
 
 import sys
+import collections
 
 
 def dumps(obj, nested_level=0, output=sys.stdout):
 	"""格式化输出，主要解决utf-8编码无法看的问题"""
 	spacing = '\t'
-	if type(obj) == dict:
+	if isinstance(obj, (dict, collections.OrderedDict)):
 		print('%s{' % ((nested_level) * spacing), file=output)
 		for k, v in obj.items():
 			if hasattr(v, '__iter__'):
