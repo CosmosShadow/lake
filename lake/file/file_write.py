@@ -33,8 +33,8 @@ def write_csv(data, path, is_excel=False):
 			csvfile.write(u"\ufeff")
 		writer = csv.writer(csvfile)
 		for row in data:
-			writer.writerow([unicode(s).encode("utf-8") for s in row])
-			# writer.writerow(row)
+			# writer.writerow([unicode(s).encode("utf-8") for s in row])
+			writer.writerow(row)
 
 
 def write_dot(data, path):
