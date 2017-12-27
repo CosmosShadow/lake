@@ -30,3 +30,18 @@ def is_substr(find, data):
 		if find not in data[i]:
 			return False
 	return True
+
+
+def encode32(value):
+	"""转成32位码
+	Args:
+		value : string
+	Returns:
+		value : string
+	"""
+	import binascii
+	from hashids import Hashids
+	hashids = Hashids(alphabet='0123456789abcdefghijklmnopqrstuvwxyz', min_length=6)
+	md5 = lambda s: hashlib.md5(s).hexdigest()
+	crc32 = lambda s: '%08X' % (binascii.crc32(s) & 0xffffffff)
+	return crc32(value)
