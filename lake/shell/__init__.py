@@ -56,6 +56,25 @@ def run(cmd):
 	return output.read()
 
 
+def run_with_timeout(cmd, timeout_sec):
+	"""有时限的行运脚本
+	Args:
+		cmd : 命令行
+		timeout_sec: 超时时长(秒为单位)
+	"""
+	import subprocess
+	from threading import Timer
+	proc = subprocess.Popen(cmd, shell=True)
+	kill_proc = lambda p: p.kill()
+	timer = Timer(timeout_sec, kill_proc, [proc])
+	try:
+		timer.start()
+		stdout,stderr = proc.communicate()
+	finally:
+		timer.cancel()
+
+
+
 def call(cmd):
 	"""运行不返回结果"""
 	os.system(cmd)
