@@ -1,5 +1,5 @@
 # coding: utf-8
-# 缩写原文
+# 自然语言缩写名字的解释
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import division
