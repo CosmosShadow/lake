@@ -1,6 +1,7 @@
 # coding: utf-8
 # 数据库类
 # 一个管理类与数据库字段映射的小工具
+# 有时间看看这个库: https://github.com/coleifer/peewee
 import json
 
 class DBClass(object):
