@@ -116,6 +116,25 @@ class MySQLClient(object):
 		return []
 
 
+class DBTable(object):
+	"""数据库表操作: 拉取、推送
+		可用于数据表备份、同步
+	"""
+	def __init__(self, host, port, user, password, db):
+		super(DBTable, self).__init__()
+		self.host = host
+		self.port = port
+		self.user = user
+		self.password = password
+		self.db = db
+
+	def pull(self, table, save_path='tmp.sql'):
+		shell = 'mysqldump --lock-tables=false --set-gtid-purged=OFF -h%s -P%d -u%s -p%s %s %s > %s' % \
+			(self.host,  self.port, self.user, self.password, self.db, table, save_path)
+		lake.shell.run(shell)
+
+	def push(self, sql_path='tmp.sql'):
+		shell = 'mysql -h%s -P%s -u%s -p%s %s < %s' % (self.host, self.port, self.user, self.password, self.db, sql_path)
 
 
 
