@@ -120,13 +120,14 @@ class DBTable(object):
 	"""数据库表操作: 拉取、推送
 		可用于数据表备份、同步
 	"""
-	def __init__(self, host, port, user, password, db):
+	def __init__(self, config):
 		super(DBTable, self).__init__()
-		self.host = host
-		self.port = port
-		self.user = user
-		self.password = password
-		self.db = db
+		# host, port, user, password, db
+		self.host = config.get('host', 'localhost')
+		self.port = config.get('port', 3306)
+		self.user = config.get('user', 'root')
+		self.password = config.get('passwd')
+		self.db = config.get('db')
 
 	def pull(self, table, save_path='tmp.sql'):
 		shell = 'mysqldump --lock-tables=false --set-gtid-purged=OFF -h%s -P%d -u%s -p%s %s %s > %s' % \
