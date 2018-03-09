@@ -77,6 +77,7 @@ class _downloader(object):
 
 
 def download(download_list, thread_count = 10, timeout = 10, retry = 5):
+	# download_list: [(image_url, save_path)]
 	op = _downloader(thread_count, timeout, retry)
 	op.download(download_list)
 
