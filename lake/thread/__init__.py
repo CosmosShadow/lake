@@ -15,6 +15,7 @@ def pool_local(locals, target, inputs):
 
 	for input_data in inputs:
 		data_q.put(input_data)
+	data_q.close()
 
 	thread_count = len(locals)
 	ps = []
