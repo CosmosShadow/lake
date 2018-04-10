@@ -47,3 +47,12 @@ def encode32(value):
 	md5 = lambda s: hashlib.md5(s).hexdigest()
 	crc32 = lambda s: '%08X' % (binascii.crc32(s) & 0xffffffff)
 	return crc32(value)
+
+
+def md5(txt):
+	import hashlib
+	md5_obj = hashlib.md5()
+	md5_obj.update(txt)
+	hash_code = md5_obj.hexdigest()
+	md5_str = str(hash_code).lower()
+	return md5_str
