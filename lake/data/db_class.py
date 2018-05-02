@@ -78,6 +78,32 @@ class DBClass(object):
 		return json.dumps(data, indent=4)
 
 
+class DBClassBaseLoad(object):
+	@staticmethod
+	def dumps(obj):
+		return obj
+
+	@staticmethod
+	def loads(obj):
+		return obj
+
+
+class utf8_json(DBClassBaseLoad):
+	@staticmethod
+	def dumps(obj):
+		return json.dumps(obj, ensure_ascii=False)
+
+	@staticmethod
+	def loads(obj):
+		return json.loads(obj)
+
+
+class str_load(DBClassBaseLoad):
+	@staticmethod
+	def loads(obj):
+		return str(obj)
+
+
 
 if __name__ == '__main__':
 	a = DBClass()

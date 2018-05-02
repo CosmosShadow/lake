@@ -18,6 +18,9 @@ def date_str():
 def date_str_simple():
 	return datetime.date.today().strftime(simple_date_format)
 
+def str_2_datetime(date_str):
+	return datetime.datetime.strptime(date_str, datetime_format)
+
 
 if __name__ == '__main__':
 	print(datetime_str())
@@ -33,3 +36,5 @@ if __name__ == '__main__':
 	print(datetime.datetime.now().date().timetuple())
 	print(datetime.datetime.now().date() + datetime.timedelta(days=1))
 	print(type(datetime.date.today()))
+
+	print (str_2_datetime('2018-05-02 15:07:00'))
