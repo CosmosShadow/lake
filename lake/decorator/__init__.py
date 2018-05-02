@@ -6,6 +6,7 @@ from __future__ import division
 from .decorator_singleton import *
 from .decorator_time import *
 from .decorator_args import *
+from .decorator_logging import *
 
 
 def register_fun(cls):
