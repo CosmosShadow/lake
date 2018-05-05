@@ -1,6 +1,5 @@
 # coding: utf-8
 # 使用装饰器来对函数进行自动logging
-import json
 
 def logging_fun(log_fun, comment=''):
 	"""
@@ -9,7 +8,9 @@ def logging_fun(log_fun, comment=''):
 		comment: 注释
 	Waning: 函数参数需能够进行json化
 	"""
-	def _deco(func):  
+	import json
+	
+	def _deco(func):
 		def __deco(*args, **kwargs):
 			message = {
 				'函数名': func.func_name,
