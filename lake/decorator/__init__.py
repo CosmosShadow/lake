@@ -23,3 +23,13 @@ def empty_decorator(func):
 	def _fun(*args, **kwargs):
 		return func(*args, **kwargs)
 	return _fun
+
+
+
+def empty_decorator_with_params(*empty_args, **empty_kwargs):
+	# 支持带参的空装饰器
+	def __fun(func):
+		def _fun(*args, **kwargs):
+			return func(*args, **kwargs)
+		return _fun
+	return __fun

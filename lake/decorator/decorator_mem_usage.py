@@ -20,23 +20,25 @@ def size_2_human(mem_usage):
 
 def log_mem_usage(prefix=''):
 	now_size = size_2_human(get_current_mem_usage())
-	message = ' %s:  内存使用: %s' % (prefix, now_size)
+	message = ' 内存状态     %s:  内存使用: %s' % (prefix, now_size)
 	logging.info(message)
 
 
-def mem_usage(func):
-	def _fun(*args, **kwargs):
-		past_mem = get_current_mem_usage()
-		ret = func(*args, **kwargs)
-		now_mem = get_current_mem_usage()
+def mem_usage(prefix=''):
+	def __fun(func):
+		def _fun(*args, **kwargs):
+			past_mem = get_current_mem_usage()
+			ret = func(*args, **kwargs)
+			now_mem = get_current_mem_usage()
 
-		past_size = size_2_human(past_mem)
-		add_size = size_2_human(now_mem - past_mem)
-		new_size = size_2_human(now_mem)
-		logging.info(' 内存状态    函数名: %s    原本: %s    新增: %s    最新: %s' % (func.func_name, past_size, add_size, new_size))
+			past_size = size_2_human(past_mem)
+			add_size = size_2_human(now_mem - past_mem)
+			new_size = size_2_human(now_mem)
+			logging.info(' 内存状态    函数名: %s%s    原本: %s    新增: %s    最新: %s' % (prefix, func.func_name, past_size, add_size, new_size))
 
-		return ret
-	return _fun
+			return ret
+		return _fun
+	return __fun
 
 
 if __name__ == '__main__':
