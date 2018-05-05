@@ -54,4 +54,17 @@ if __name__ == '__main__':
 
 # test()
 
+	# 注释掉 lake.__init__ 下所以import后，输出: 
+	# 内存状态    函数名: test    原本: 7.355 M    新增: 0.766 M    最新: 8.121 M
+	
+# # coding: utf-8
+# from lake import decorator
+
+# @decorator.mem_usage
+# def test():
+# 	a = [0] * 100000
+# 	return a
+
+# test()
+
 
