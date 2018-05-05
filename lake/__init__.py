@@ -16,4 +16,4 @@ from __future__ import print_function
 # from . import tm
 # from . import shell
 # from . import nlp
-# from .etc import *
+from .etc import *

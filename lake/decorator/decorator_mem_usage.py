@@ -1,7 +1,6 @@
 # coding: utf-8
 # 内存使用情况装饰器
 import logging
-_logger = logging.getLogger(__name__)
 
 # 如果logging没有设置，默认是ERROR。
 if len(logging.getLogger().handlers) == 0:
@@ -21,7 +20,8 @@ def size_2_human(mem_usage):
 
 def log_mem_usage(prefix=''):
 	now_size = size_2_human(get_current_mem_usage())
-	_logger.info(' %s当前内存使用: %s' % (prefix, now_size))
+	message = ' %s:  内存使用: %s' % (prefix, now_size)
+	logging.info(message)
 
 
 def mem_usage(func):
@@ -33,7 +33,7 @@ def mem_usage(func):
 		past_size = size_2_human(past_mem)
 		add_size = size_2_human(now_mem - past_mem)
 		new_size = size_2_human(now_mem)
-		_logger.info(' 内存状态    函数名: %s    原本: %s    新增: %s    最新: %s' % (func.func_name, past_size, add_size, new_size))
+		logging.info(' 内存状态    函数名: %s    原本: %s    新增: %s    最新: %s' % (func.func_name, past_size, add_size, new_size))
 
 		return ret
 	return _fun
