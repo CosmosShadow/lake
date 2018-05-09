@@ -29,6 +29,6 @@ if __name__ == '__main__':
 
 	@logging_fun(logging.error, 'comment')
 	def hello(arg):
-		print arg
+		print(arg)
 
 	hello('world')

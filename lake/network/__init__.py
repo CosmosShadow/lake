@@ -6,10 +6,10 @@ from . import proxy
 
 import requests
 
-def download_file(url, save_path, proxies=None):
+def download_file(url, save_path, headers={}, proxies=None):
 	"""下载文件: 主要是大文件，流式下载"""
 	chunk_size = 128
-	r = requests.get(url, stream=True, proxies=proxies)
+	r = requests.get(url, stream=True, headers=headers, proxies=proxies)
 	with open(save_path, 'wb') as fd:
 		for chunk in r.iter_content(chunk_size):
 			fd.write(chunk)

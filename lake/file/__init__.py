@@ -8,6 +8,11 @@ from .file_write import *
 from .file_pkg import *
 
 
+def exists(path):
+	# 是否存在
+	import os
+	return os.path.exists(path)
+
 # 序列化
 def serialize(data, path):
 	import pickle
