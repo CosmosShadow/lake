@@ -5,6 +5,8 @@ from __future__ import print_function
 import datetime
 
 datetime_format = '%Y-%m-%d %H:%M:%S'
+simple_datetime_format = '%Y%m%d_%H%M%S'
+
 date_format = '%Y-%m-%d'
 simple_date_format = '%Y%m%d'
 
@@ -19,6 +21,12 @@ def date_str(the_date=None):
 	# 年-月-日
 	the_date = the_date or datetime.date.today()
 	return the_date.strftime(date_format)
+
+
+def datetime_str_simple(the_time=None):
+	# 年月日时分秒
+	the_time = the_time or datetime.datetime.now()
+	return the_time.strftime(simple_datetime_format)
 
 
 def date_str_simple(the_date=None):
