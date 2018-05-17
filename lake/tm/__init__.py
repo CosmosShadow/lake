@@ -56,3 +56,6 @@ if __name__ == '__main__':
 	print(type(datetime.date.today()))
 
 	print (str_2_datetime('2018-05-02 15:07:00'))
+
+	run_time = (datetime.datetime.now() - str_2_datetime('2018-05-02 15:07:00'))
+	print(run_time.seconds)
