@@ -6,6 +6,7 @@ import datetime
 
 datetime_format = '%Y-%m-%d %H:%M:%S'
 simple_datetime_format = '%Y%m%d_%H%M%S'
+simplest_datetime_format = '%Y%m%d%H%M%S'
 
 date_format = '%Y-%m-%d'
 simple_date_format = '%Y%m%d'
@@ -37,6 +38,9 @@ def date_str_simple(the_date=None):
 
 def str_2_datetime(date_str):
 	return datetime.datetime.strptime(date_str, datetime_format)
+
+def simplest_str_2_datetime(date_str):
+	return datetime.datetime.strptime(date_str, simplest_datetime_format)
 
 
 if __name__ == '__main__':
