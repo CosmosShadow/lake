@@ -20,12 +20,7 @@ def download_file(url, save_path, headers={}, proxies=None, max_size=None, timeo
 	"""
 	size = 0
 	chunk_size = 2048
-	r = requests.get(url, stream=True, headers=headers, proxies=proxies, timeout=timeout)
-	# 文件头显示内容直接过大
-	if max_size is not None and int(r.headers['content-length']) > max_size:
-		print('文件过大')
-		return False
-	# 保存
+	r = requests.get(url, stream=True, headers=headers, proxies=proxies)
 	with open(save_path, 'wb') as fd:
 		for chunk in r.iter_content(chunk_size):
 			fd.write(chunk)
