@@ -14,8 +14,10 @@ def read(path):
 			return [line.strip() for line in text_file.readlines()]
 
 
-def read_csv(path, delimiter=','):
+def read_csv(path, delimiter=',', replace_null=False):
 	with file(path, 'rb') as csvfile:
+		if replace_null:
+			csvfile = [line.replace("\0",'') for line in csvfile]
 		reader = csv.reader(csvfile, delimiter=delimiter)
 		data = [line for line in reader]
 	return data
