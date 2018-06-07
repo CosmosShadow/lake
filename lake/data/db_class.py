@@ -3,6 +3,7 @@
 # 一个管理类与数据库字段映射的小工具
 # 有时间看看这个库: https://github.com/coleifer/peewee
 import json
+import copy
 
 class DBClass(object):
 	# fields = 'id, contents, status'
@@ -40,6 +41,12 @@ class DBClass(object):
 					else:
 						self._datas[name] = value
 
+	def dumps(self):
+		value = copy.copy(self._datas)
+		return value
+
+	def loads(self, datas):
+		self._datas.update(datas)
 
 	def __setattr__(self, name, value):
 		if name.startswith('_'):
@@ -54,6 +61,8 @@ class DBClass(object):
 			return self._datas[name]
 
 	def get_names(self, excludes=[]):
+		if not isinstance(excludes, list):
+			excludes = [excludes]
 		fields = map(lambda x: x.strip(), self.__class__.fields.split(','))
 		return list(set(fields) - set(excludes))
 
