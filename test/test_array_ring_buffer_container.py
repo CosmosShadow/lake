@@ -1,7 +1,7 @@
 # coding: utf-8
 from nose.tools import *
 import numpy as np
-import lake
+import lake.array
 
 
 class TestRingBufferContainer(object):

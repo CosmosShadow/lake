@@ -1,6 +1,6 @@
 # coding: utf-8
 import numpy as np
-import lake
+import lake.array
 
 
 class TestRingBuffer(object):

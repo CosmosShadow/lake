@@ -1,6 +1,6 @@
 # coding: utf-8
 from nose.tools import *
-import lake
+import lake.string
 
 
 class Test(object):
