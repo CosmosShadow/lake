@@ -34,6 +34,7 @@ if __name__ == '__main__':
 		with TimeOut(1) as t:
 			time.sleep(2)
 			print('ok')
-	except TimeOutError as e:
+	except Exception as e:
+		print(isinstance(e, TimeOutError))
 		print(e.message)
 		print('超时')
