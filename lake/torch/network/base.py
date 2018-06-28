@@ -3,6 +3,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import lake.torch
+import lake.string
 
 
 class Base(nn.Module):
@@ -30,7 +31,7 @@ class Base(nn.Module):
 
 	def init_weights(self):
 		if self.use_cuda:
-			self.cuda(device_id=self.gpu_ids[0])
+			self.cuda()
 		self.apply(self._init_weight)
 
 	def print_net(self):
@@ -71,7 +72,7 @@ class Base(nn.Module):
 	def save_network(self, save_path):
 		torch.save(self.cpu().state_dict(), save_path)
 		if self.use_cuda:
-			self.cuda(device_id=self.gpu_ids[0])
+			self.cuda()
 
 	def load_network(self, save_path):
 		self.load_state_dict(torch.load(save_path))
@@ -86,7 +87,7 @@ class Base(nn.Module):
 
 	def train_step(self, step, data):
 		"""训练一步"""
-		pass
+		raise NotImplementedError('train_step必须实现')
 
 	def test_step(self, step, data):
 		"""测试一步"""

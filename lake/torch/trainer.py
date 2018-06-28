@@ -5,7 +5,8 @@ import os
 import sys
 import json
 import argparse
-import lake
+import lake.dir
+import lake.file
 import torch
 import logging
 import numpy as np
@@ -222,10 +223,10 @@ class Trainer(object):
 			self.optimizer.zero_grad()
 			error.backward()
 			if self.opt.clip_grad_norm > 0:
-				torch.nn.utils.clip_grad_norm(self.model.parameters(), self.opt.clip_grad_norm)
+				torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.opt.clip_grad_norm)
 			self.optimizer.step()
 
-			self.add_record('loss', float(error.data[0]))
+			self.add_record('loss', float(error.data))
 			for key, value in train_dict.iteritems():
 				if key != 'loss':
 					self.add_record(key, value)
