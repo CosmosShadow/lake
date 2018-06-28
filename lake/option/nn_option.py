@@ -24,6 +24,7 @@ class NNOptions(Options):
 		self.parser.add_argument('--option', type=str, default='base', help='only placeholder')
 		self.parser.add_argument('--output', type=str, default='', help='only placeholder')
 
+		self.parser.add_argument('--test_per', type=int, default=100, help='test interval')
 		self.parser.add_argument('--save_per', type=int, default=1e4, help='save interval')
 		self.parser.add_argument('--print_per', type=int, default=100, help='print interval')
 

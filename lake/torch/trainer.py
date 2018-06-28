@@ -239,11 +239,9 @@ class Trainer(object):
 		self._model.train_start()
 
 		while self.epoch <= self.opt.epochs:
-			if self.data_train is not None:
-				train_batch_count = self.data_train.count(self.opt.batch_size)
-				if self.epoch % train_batch_count == 0:
-					self._model.eval()
-					self._test()
+			if self.epoch >= self.opt.test_per and self.epoch % self.opt.test_per == 0:
+				self._model.eval()
+				self._test()
 
 			self._model.train()
 			self._train()
