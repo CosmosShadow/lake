@@ -169,6 +169,8 @@ class Trainer(object):
 			if key != 'epoch':
 				value = ('%.6f' % value) if isinstance(value, float) else str(value)
 				results.append('%s: %s' % (key, value))
+		if self.has_test:
+			self._logger.info('-' * 10)
 		self._logger.info('   '.join(results))
 
 	def _store_record(self):
@@ -239,7 +241,8 @@ class Trainer(object):
 		self._model.train_start()
 
 		while self.epoch <= self.opt.epochs:
-			if self.epoch >= self.opt.test_per and self.epoch % self.opt.test_per == 0:
+			self.has_test = self.epoch >= self.opt.test_per and self.epoch % self.opt.test_per == 0
+			if self.has_test:
 				self._model.eval()
 				self._test()
 
