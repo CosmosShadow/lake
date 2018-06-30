@@ -16,12 +16,13 @@ from . import network as torch_network
 
 
 class Trainer(object):
-	def __init__(self, log_to_console=True):
+	def __init__(self, option_name=None, log_to_console=True):
 		"""description
 		Args:
 			log_to_console: 显示到命令行，有其它模块设置了logging
 		"""
 		self.log_to_console = log_to_console
+		self._option_name = option_name
 		self.data_train = None
 		self.data_test = None
 		self._model = None
@@ -74,7 +75,15 @@ class Trainer(object):
 			option_dict = json.loads(option_json)
 			self.opt = namedtuple('X', option_dict.keys())(*option_dict.values())
 		else:
-			option_name = args.option if len(args.option) > 0 else 'base'
+			# _option_name
+			if len(args.option) > 0:
+				option_name = args.option
+			elif self._option_name is not None:
+				print(self._option_name)
+				option_name = self._option_name
+			else:
+				option_name = 'base'
+				
 			sys.path.append('options')
 			opt_pkg = __import__('option_' + option_name)
 			self.opt = opt_pkg.Options()()

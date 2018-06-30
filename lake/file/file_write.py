@@ -27,11 +27,11 @@ def write_txt(data, path):
 			text_file.write(json.dumps(data))
 
 
-def write_csv(data, path, is_excel=False):
+def write_csv(data, path, is_excel=False, delimiter=','):
 	with file(path, 'wb') as csvfile:
 		if is_excel:
 			csvfile.write(u"\ufeff")
-		writer = csv.writer(csvfile)
+		writer = csv.writer(csvfile, delimiter=delimiter)
 		for row in data:
 			# writer.writerow([unicode(s).encode("utf-8") for s in row])
 			writer.writerow(row)
