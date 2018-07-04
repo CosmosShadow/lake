@@ -10,19 +10,20 @@ import lake.file
 import torch
 import logging
 import numpy as np
-from collections import namedtuple
+from recordtype import recordtype
 import time
 from . import network as torch_network
 
 
 class Trainer(object):
-	def __init__(self, option_name=None, log_to_console=True):
+	def __init__(self, output=None, option_name=None, log_to_console=True):
 		"""description
 		Args:
 			log_to_console: 显示到命令行，有其它模块设置了logging
 		"""
 		self.log_to_console = log_to_console
 		self._option_name = option_name
+		self._output = output
 		self.data_train = None
 		self.data_test = None
 		self._model = None
@@ -53,8 +54,11 @@ class Trainer(object):
 
 	def _load_output_dir(self, args):
 		# 确定输出目录，默认起一个时间
+		# 命令行参数 > 传参 > 默认
 		if len(args.output) > 0:
 			self.output = args.output
+		elif self._output is not None:
+			self.output = self._output
 		else:
 			self.output = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
 
@@ -73,9 +77,9 @@ class Trainer(object):
 		if os.path.exists(self._option_path):
 			option_json = lake.file.read(self._option_path)
 			option_dict = json.loads(option_json)
-			self.opt = namedtuple('X', option_dict.keys())(*option_dict.values())
+			self.opt = recordtype('X', option_dict.keys())(*option_dict.values())
 		else:
-			# _option_name
+			# _option_name: 命令行 > 传参 > 默认
 			if len(args.option) > 0:
 				option_name = args.option
 			elif self._option_name is not None:
