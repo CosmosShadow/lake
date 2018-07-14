@@ -1,5 +1,5 @@
 # coding: utf-8
-from PIL import Image
+from PIL import Image, ImageDraw
 import lake
 import  os
 import sys
@@ -55,23 +55,38 @@ def rotate_with_background(img, angel, bg=(255,)*4):
 
 
 def alpha_to_color(image, color=(255, 255, 255)):
-    """Set all fully transparent pixels of an RGBA image to the specified color.
-    This is a very simple solution that might leave over some ugly edges, due
-    to semi-transparent areas. You should use alpha_composite_with color instead.
+	"""Set all fully transparent pixels of an RGBA image to the specified color.
+	This is a very simple solution that might leave over some ugly edges, due
+	to semi-transparent areas. You should use alpha_composite_with color instead.
 
-    Source: http://stackoverflow.com/a/9166671/284318
+	Source: http://stackoverflow.com/a/9166671/284318
 
-    Keyword Arguments:
-    image -- PIL RGBA Image object
-    color -- Tuple r, g, b (default 255, 255, 255)
+	Keyword Arguments:
+	image -- PIL RGBA Image object
+	color -- Tuple r, g, b (default 255, 255, 255)
 
-    """ 
-    x = np.array(image)
-    r, g, b, a = np.rollaxis(x, axis=-1)
-    # print np.where(a != 0)
-    r[a == 0] = color[0]
-    g[a == 0] = color[1]
-    b[a == 0] = color[2]
-    a = np.ones_like(a) * 255
-    x = np.dstack([r, g, b, a])
-    return Image.fromarray(x, 'RGBA')
+	""" 
+	x = np.array(image)
+	r, g, b, a = np.rollaxis(x, axis=-1)
+	# print np.where(a != 0)
+	r[a == 0] = color[0]
+	g[a == 0] = color[1]
+	b[a == 0] = color[2]
+	a = np.ones_like(a) * 255
+	x = np.dstack([r, g, b, a])
+	return Image.fromarray(x, 'RGBA')
+
+
+def draw_rectangles(img_path, rects, save_path, color=(255, 0, 0)):
+	# 图像上画矩形
+	img = Image.open(img_path)
+	draw = ImageDraw.Draw(img)
+	for x0, y0, x1, y1 in rects:
+		draw.rectangle([(x0, y0), (x1, y1)], outline=color)
+	img.save(save_path)
+
+
+
+
+
+
