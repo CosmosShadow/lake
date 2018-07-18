@@ -5,6 +5,7 @@ import  os
 import sys
 import numpy as np
 import collections
+import random
 
 IMG_EXTENSIONS = ['.jpg', '.JPG', '.jpeg', '.JPEG', '.png', '.PNG', '.ppm', '.PPM', '.bmp', '.BMP']
 
@@ -77,11 +78,16 @@ def alpha_to_color(image, color=(255, 255, 255)):
 	return Image.fromarray(x, 'RGBA')
 
 
-def draw_rectangles(img_path, rects, save_path, color=(255, 0, 0)):
+def draw_rectangles(img_path, rects, save_path, color=(255, 0, 0), random_color=False):
 	# 图像上画矩形
+	rndint = lambda: random.randint(0, 255)
+	colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 0, 255)]
 	img = Image.open(img_path)
 	draw = ImageDraw.Draw(img)
 	for x0, y0, x1, y1 in rects:
+		if random_color:
+			# color = (rndint(), rndint(), rndint())
+			color = random.choice(colors)
 		draw.rectangle([(x0, y0), (x1, y1)], outline=color)
 	img.save(save_path)
 
