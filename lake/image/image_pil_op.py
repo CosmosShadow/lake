@@ -84,10 +84,14 @@ def draw_rectangles(img_path, rects, save_path, color=(255, 0, 0), random_color=
 	colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 0, 255)]
 	img = Image.open(img_path)
 	draw = ImageDraw.Draw(img)
-	for x0, y0, x1, y1 in rects:
+	for rect in rects:
 		if random_color:
 			# color = (rndint(), rndint(), rndint())
 			color = random.choice(colors)
+		if len(rect) == 4:
+			x0, y0, x1, y1 = rect
+		else:
+			x0, y0, x1, y1, color = rect
 		draw.rectangle([(x0, y0), (x1, y1)], outline=color)
 	img.save(save_path)
 
