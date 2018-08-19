@@ -131,12 +131,12 @@ class DBTable(object):
 		self.db = config.get('db')
 
 	def pull(self, table, save_path='tmp.sql'):
-		shell = 'mysqldump --lock-tables=false --set-gtid-purged=OFF -h%s -P%d -u%s -p%s %s %s > %s' % \
+		shell = 'source ~/.bash_profile & mysqldump --lock-tables=false --set-gtid-purged=OFF -h%s -P%d -u%s -p%s %s %s > %s' % \
 			(self.host,  self.port, self.user, self.password, self.db, table, save_path)
-		lake.shell.run(shell)
+		lake.shell.call(shell)
 
 	def push(self, sql_path='tmp.sql'):
-		shell = 'mysql -h%s -P%s -u%s -p%s %s < %s' % (self.host, self.port, self.user, self.password, self.db, sql_path)
+		shell = 'source ~/.bash_profile & mysql -h%s -P%s -u%s -p%s %s < %s' % (self.host, self.port, self.user, self.password, self.db, sql_path)
 
 
 
