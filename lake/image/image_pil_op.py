@@ -96,6 +96,18 @@ def draw_rectangles(img_path, rects, save_path, color=(255, 0, 0), random_color=
 	img.save(save_path)
 
 
+def draw_polygons(img_path, points_arr, save_path, color=(255, 0, 0), random_color=False):
+	# 图像多边形
+	rndint = lambda: random.randint(0, 255)
+	colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 0, 255)]
+	img = Image.open(img_path)
+	draw = ImageDraw.Draw(img)
+	for points in points_arr:
+		if random_color:
+			color = random.choice(colors)
+		draw.polygon(points, outline=color)
+	img.save(save_path)
+
 
 
 
