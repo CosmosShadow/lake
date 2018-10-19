@@ -19,7 +19,7 @@ class Options(object):
 	def show(self):
 		print('------------ Options -------------')
 		for k, v in sorted(vars(self.opt).items()):
-			print('%s: %s' % (str(k), str(v)))
+			print("{:30} {}".format(k, v))
 		print('-------------- End ----------------')
 
 	def __call__(self):
