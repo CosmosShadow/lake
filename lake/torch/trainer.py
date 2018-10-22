@@ -256,10 +256,10 @@ class Trainer(object):
 		while self.epoch <= self.opt.epochs:
 			self.has_test = self.epoch >= self.opt.test_per and self.epoch % self.opt.test_per == 0
 			if self.has_test:
-				self._model.eval()
+				# self._model.eval()
 				self._test()
 
-			self._model.train()
+			# self._model.train()
 			self._train()
 
 			if self.epoch % self.opt.save_per == 0:
