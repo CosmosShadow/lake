@@ -173,12 +173,12 @@ class Trainer(object):
 		self._epoch_records[key] = value
 
 	def add_records(self, records):
-		for key, value in records.iteritems():
+		for key, value in records.items():
 			self.add_record(key, value)
 
 	def _epoch_log(self, values):
 		results = ['epoch: %d' % self.epoch]
-		for key, value in values.iteritems():
+		for key, value in values.items():
 			if key != 'epoch':
 				value = ('%.6f' % value) if isinstance(value, float) else str(value)
 				results.append('%s: %s' % (key, value))
@@ -242,7 +242,7 @@ class Trainer(object):
 			self.optimizer.step()
 
 			self.add_record('loss', float(error.data))
-			for key, value in train_dict.iteritems():
+			for key, value in train_dict.items():
 				if key != 'loss':
 					self.add_record(key, value)
 

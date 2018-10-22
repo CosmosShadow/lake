@@ -7,4 +7,4 @@ def reverse_list_v(values):
 	Returns:
 		{v1: k1, v2: k2, ...}
 	"""
-	return dict([(item, i) for i, j in values.iteritems() for item in j])
+	return dict([(item, i) for i, j in values.items() for item in j])
