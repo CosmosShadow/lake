@@ -241,7 +241,7 @@ class Trainer(object):
 				torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.opt.clip_grad_norm)
 			self.optimizer.step()
 
-			self.add_record('loss', float(error.data))
+			self.add_record('loss', float(error.data.cpu().item()))
 			for key, value in train_dict.items():
 				if key != 'loss':
 					self.add_record(key, value)
