@@ -15,7 +15,7 @@ def add_csv(row, path):
 
 
 def add_txt(data, path):
-	with open(path, "ab") as text_file:
+	with open(path, "a") as text_file:
 		if isinstance(data, str):
 			text_file.write(str(data))
 		elif isinstance(data, list):
@@ -26,7 +26,7 @@ def add_txt(data, path):
 			text_file.write(json.dumps(data))
 
 def add_line(line, path):
-	with open(path, "ab") as text_file:
+	with open(path, "a") as text_file:
 		text_file.write(str(line) + '\n')
 
 
