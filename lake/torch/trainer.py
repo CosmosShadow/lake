@@ -257,13 +257,13 @@ class Trainer(object):
 					self.add_record(key, value)
 
 	def new_model_path(self):
-		path = os.path.join(self.output_dir, '%d.pth' % self.epoch)
+		path = os.path.join(_output_dir, '%d.pth' % self.epoch)
 		if os.path.isfile(path):
 			raise ValueError('模型已经存在，不能覆盖保存')
 		return path
 
 	def last_model_path(self):
-		paths = lake.dir.loop(self.output_dir, ['pth'])
+		paths = lake.dir.loop(_output_dir, ['pth'])
 		if len(paths) > 0:
 			epochs = np.array([int(os.path.basename(x).split('.')[0]) for x in paths])
 			index = np.argmax(epochs)
