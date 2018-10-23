@@ -138,11 +138,13 @@ class Trainer(object):
 			else:
 				model_path = self.last_model_path()
 			if model_path is not None:
+				print(model_path)
 				self._model.load_network(model_path)
 				self._logger.info('模型加载成功')
 			else:
 				self._logger.info('模型未加载')
 		except Exception as e:
+			print(e)
 			self._logger.info('模型加载出错')
 			self.epoch = 1
 
@@ -263,7 +265,7 @@ class Trainer(object):
 		return path
 
 	def last_model_path(self):
-		paths = lake.dir.loop(self._output_dir, ['pth'])
+		paths = lake.dir.loop(self._output_dir, ['.pth'])
 		if len(paths) > 0:
 			epochs = np.array([int(os.path.basename(x).split('.')[0]) for x in paths])
 			index = np.argmax(epochs)
