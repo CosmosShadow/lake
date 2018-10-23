@@ -13,16 +13,18 @@ import numpy as np
 from recordtype import recordtype
 import time
 from . import network as torch_network
+import numpy as np
 
 
 class Trainer(object):
-	def __init__(self, output=None, option_name=None, log_to_console=False):
+	def __init__(self, output=None, option_name=None, log_to_console=False, epoch_to_load=None):
 		"""description
 		Args:
 			log_to_console: 显示到命令行，有其它模块设置了logging
 		"""
 		self.log_to_console = log_to_console
 		self._option_name = option_name
+		self._epoch_to_load = epoch_to_load
 		self._output = output
 		self.data_train = None
 		self.data_test = None
@@ -129,11 +131,19 @@ class Trainer(object):
 		self._model = value
 		self._model.output_dir = self._output_dir
 		try:
-			self._model.load_network(self.save_path)
-			self._logger.info('load network success')
+			if self._epoch_to_load is not None:
+				model_path = os.path.join(self._output_dir, '%d.pth' % self._epoch_to_load)
+				if not os.path.isfile(model_path):
+					raise ValueError('你想加载的模型%s不存在' % model_path)
+			else:
+				model_path = self.last_model_path()
+			if model_path is not None:
+				self._model.load_network(model_path)
+				self._logger.info('模型加载成功')
+			else:
+				self._logger.info('模型未加载')
 		except Exception as e:
-			print(e)
-			self._logger.info('load network fail')
+			self._logger.info('模型加载出错')
 			self.epoch = 1
 
 	def _load_epoch(self):
@@ -246,6 +256,21 @@ class Trainer(object):
 				if key != 'loss':
 					self.add_record(key, value)
 
+	def new_model_path(self):
+		path = os.path.join(self.output_dir, '%d.pth' % self.epoch)
+		if os.path.isfile(path):
+			raise ValueError('模型已经存在，不能覆盖保存')
+		return path
+
+	def last_model_path(self):
+		paths = lake.dir.loop(self.output_dir, ['pth'])
+		if len(paths) > 0:
+			epochs = np.array([int(os.path.basename(x).split('.')[0]) for x in paths])
+			index = np.argmax(epochs)
+			path = paths[index]
+			return path
+		else:
+			return None
 
 	def train(self):
 		self._check_train_components()
@@ -263,7 +288,7 @@ class Trainer(object):
 			self._train()
 
 			if self.epoch % self.opt.save_per == 0:
-				self._model.save_network(self.save_path)
+				self._model.save_network(self.new_save_path())
 				self.add_record('save', 1)
 
 			self._run_hook()
@@ -271,7 +296,7 @@ class Trainer(object):
 			self._update_lr()
 			self.epoch += 1
 
-		self._model.save_network(self.save_path)
+		self._model.save_network(self.new_save_path())
 		self._model.train_finish()
 		self._logger.info('train finish')
 
