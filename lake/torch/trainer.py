@@ -16,7 +16,7 @@ from . import network as torch_network
 
 
 class Trainer(object):
-	def __init__(self, output=None, option_name=None, log_to_console=True):
+	def __init__(self, output=None, option_name=None, log_to_console=False):
 		"""description
 		Args:
 			log_to_console: 显示到命令行，有其它模块设置了logging
