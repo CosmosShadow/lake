@@ -191,10 +191,10 @@ class Trainer(object):
 		if hasattr(self, 'current_lr'):
 			self.add_record('lr', self.current_lr)
 		self.add_record('time', time.time() - self._epoch_start)
-		record_json = json.dumps(self._epoch_records)
-		lake.file.add_line(record_json, self.record_path)
 		if self.epoch % self.opt.print_per == 0:
 			self._epoch_log(self._epoch_records)
+		record_json = json.dumps(self._epoch_records)
+		lake.file.add_line(record_json, self.record_path)
 		self._reset_record()
 
 	def _update_lr(self, force=False):
