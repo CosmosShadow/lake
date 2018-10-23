@@ -288,7 +288,7 @@ class Trainer(object):
 			self._train()
 
 			if self.epoch % self.opt.save_per == 0:
-				self._model.save_network(self.new_save_path())
+				self._model.save_network(self.new_model_path())
 				self.add_record('save', 1)
 
 			self._run_hook()
@@ -296,7 +296,7 @@ class Trainer(object):
 			self._update_lr()
 			self.epoch += 1
 
-		self._model.save_network(self.new_save_path())
+		self._model.save_network(self.new_model_path())
 		self._model.train_finish()
 		self._logger.info('train finish')
 
