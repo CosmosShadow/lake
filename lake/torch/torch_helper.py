@@ -75,7 +75,7 @@ class TorchHelper(object):
 		3、默认: option_base
 		后两者需要保存到_output_dir目录下
 		"""
-		self._option_path = self._output_dir + 'option.json'
+		self._option_path = os.path.join(self._output_dir, 'option.json')
 		if os.path.exists(self._option_path):
 			option_json = lake.file.read(self._option_path)
 			option_dict = json.loads(option_json)
