@@ -142,7 +142,7 @@ class TorchHelper(object):
 			if model_path is not None:
 				print(model_path)
 				self._model.load_network(model_path)
-				self._logger.info('模型加载成功')
+				self._logger.info('模型{}加载成功'.format(model_path))
 			else:
 				self._logger.info('模型未加载')
 		except Exception as e:
