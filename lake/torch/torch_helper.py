@@ -48,7 +48,7 @@ class TorchHelper(object):
 		self._load_output_dir(args)
 		self._load_opt(args)
 
-		self.record_path = self._output_dir + 'record.txt'
+		self.record_path = os.path.join(self._output_dir, 'record.txt')
 
 		self._set_gpu()
 		self._config_logging()
@@ -159,7 +159,7 @@ class TorchHelper(object):
 
 	def default_optimizer(self):
 		optimizer = torch.optim.Adam(
-				self._model.model.parameters(),
+				self._model.parameters(),
 				lr=self.opt.lr,
 				weight_decay=self.opt.weight_decay)
 		return optimizer
@@ -183,8 +183,6 @@ class TorchHelper(object):
 			if key != 'epoch':
 				value = ('%.6f' % value) if isinstance(value, float) else str(value)
 				results.append('%s: %s' % (key, value))
-		if self.has_test:
-			self._logger.info('-' * 10)
 		self._logger.info('   '.join(results))
 
 	def _store_record(self):
@@ -279,3 +277,17 @@ class TorchHelper(object):
 		self._model.save_network(self.new_model_path())
 		self._model.train_finish()
 		self._logger.info('train finish')
+
+	def finished(self):
+		return self.epoch >= self.opt.epochs
+
+
+
+
+
+
+
+
+
+
+
