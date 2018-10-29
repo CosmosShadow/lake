@@ -80,7 +80,7 @@ class TorchHelper(object):
 			option_json = lake.file.read(self._option_path)
 			option_dict = json.loads(option_json)
 			self.opt = recordtype('X', option_dict.keys())(*option_dict.values())
-			print('从%s加载option'.format(self._option_path))
+			print('从{}加载option'.format(self._option_path))
 		else:
 			# _option_name: 命令行 > 传参 > 默认
 			if len(args.option) > 0:
@@ -96,7 +96,7 @@ class TorchHelper(object):
 			self.opt = opt_pkg.Options()()
 			option_json = json.dumps(vars(self.opt), indent=4)
 			lake.file.write(option_json, self._option_path)
-			print('从option_%s加载option'.format(option_name))
+			print('从option_{}加载option'.format(option_name))
 
 	def _set_gpu(self):
 		if torch.cuda.is_available():
