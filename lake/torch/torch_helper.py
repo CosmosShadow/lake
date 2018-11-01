@@ -14,6 +14,7 @@ from recordtype import recordtype
 import time
 from . import network as torch_network
 import numpy as np
+from collections import defaultdict
 
 
 class TorchHelper(object):
@@ -94,6 +95,7 @@ class TorchHelper(object):
 			sys.path.append('options')
 			opt_pkg = __import__('option_' + option_name)
 			self.opt = opt_pkg.Options()()
+			self.opt.option_name = option_name
 			option_json = json.dumps(vars(self.opt), indent=4)
 			lake.file.write(option_json, self._option_path)
 			print('从option_{}加载option'.format(option_name))
@@ -165,13 +167,11 @@ class TorchHelper(object):
 		return optimizer
 
 	def _reset_record(self):
-		self._epoch_records = {}
+		self._epoch_records = defaultdict(list)
 		self._epoch_start = time.time()
 
 	def add_record(self, key, value):
-		if isinstance(value, float):
-			value = round(value, 6)
-		self._epoch_records[key] = value
+		self._epoch_records[key].append(value)
 
 	def add_records(self, records):
 		for key, value in records.items():
@@ -186,15 +186,23 @@ class TorchHelper(object):
 		self._logger.info('   '.join(results))
 
 	def _store_record(self):
-		self.add_record('epoch', self.epoch)
-		if hasattr(self, 'current_lr'):
-			self.add_record('lr', self.current_lr)
-		self.add_record('time', time.time() - self._epoch_start)
 		if self.epoch % self.opt.print_per == 0:
-			self._epoch_log(self._epoch_records)
-		record_json = json.dumps(self._epoch_records)
-		lake.file.add_line(record_json, self.record_path)
-		self._reset_record()
+			rdf = lambda x: round(x, 6)
+			values = {}
+			for key, value in self._epoch_records.items():
+				if isinstance(value[0], (int, float)):
+					value = rdf(np.mean(value))
+				else:
+					value = value[-1]
+				values[key] = value
+				values['epoch'] = self.epoch
+			if hasattr(self, 'current_lr'):
+				values['lr'] = self.current_lr
+			values['time'] = rdf(time.time() - self._epoch_start)
+			self._epoch_log(values)
+			record_json = json.dumps(values)
+			lake.file.add_line(record_json, self.record_path)
+			self._reset_record()
 
 	def _update_lr(self, force=False):
 		if self.optimizer is not None:
@@ -203,43 +211,6 @@ class TorchHelper(object):
 				self.current_lr = self.opt.lr * (self.opt.lr_decay ** (step / self.opt.lr_decay_per))
 				for param_group in self.optimizer.param_groups:
 					param_group['lr'] = self.current_lr
-
-	# def _test(self):
-	# 	if self.data_test is not None:
-	# 		results = []
-	# 		for _ in range(self.data_test.count(self.opt.batch_size)):
-	# 			batch = self.data_test.next(self.opt.batch_size)
-	# 			result = self._model.test_step(self.epoch, batch)
-	# 			results.append(result)
-	# 		results_average = {}
-	# 		for key in results[0].keys():
-	# 			results_average['test_' + key] = np.mean([item[key] for item in results])
-	# 		self.add_records(results_average)
-	# 	else:
-	# 		result = self._model.test_step(self.epoch, None)
-	# 		if result is not None:
-	# 			result = dict(zip(['test_' + key for key in result.keys()], result.values()))
-	# 			self.add_records(result)
-
-
-	# def _train(self):
-	# 	batch = self.data_train.next(self.opt.batch_size) if self.data_train is not None else None
-	# 	train_dict = self._model.train_step(self.epoch, batch)
-
-	# 	if self.optimizer is None:
-	# 		self.add_records(train_dict)
-	# 	else:
-	# 		error = train_dict['loss']
-	# 		self.optimizer.zero_grad()
-	# 		error.backward()
-	# 		if self.opt.clip_grad_norm > 0:
-	# 			torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.opt.clip_grad_norm)
-	# 		self.optimizer.step()
-
-	# 		self.add_record('loss', float(error.data.cpu().item()))
-	# 		for key, value in train_dict.items():
-	# 			if key != 'loss':
-	# 				self.add_record(key, value)
 
 	def new_model_path(self):
 		path = os.path.join(self._output_dir, '%d.pth' % self.epoch)
