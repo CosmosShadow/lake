@@ -31,3 +31,5 @@ class NNOptions(Options):
 
 		# 默认一块GPU，内部会检测cuda是否可用，仅可用时生效
 		self.parser.add_argument('--gpu_ids', nargs='+', default=[0], help='gpu_ids, eg [0, 1]')
+
+		self.parser.add_argument('--debug', type=int, default=0, help='')

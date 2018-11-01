@@ -1,4 +1,6 @@
 # coding: utf-8
+from __future__ import absolute_import
+from __future__ import print_function
 import os
 import sys
 import json
@@ -16,11 +18,23 @@ from collections import defaultdict
 
 
 class TorchHelper(object):
-	def __init__(self, outputs_path = './outputs/', output=None, option_name=None):
+	def __init__(self, outputs_path = './outputs/', output=None, option_name=None, log_to_console=False, epoch_to_load=None):
+		"""description
+		Args:
+			log_to_console: 显示到命令行，有其它模块设置了logging
+		"""
+		self.log_to_console = log_to_console
 		self._outputs_path = outputs_path
-		self._output = output
 		self._option_name = option_name
+		self._epoch_to_load = epoch_to_load
+		self._output = output
+		self.data_train = None
+		self.data_test = None
+		self._model = None
+		self.optimizer = None
+		self.hooks = []
 		self._load()
+		self._reset_record()
 
 	def _parse_args(self):
 		# 解析命令行输入
@@ -35,9 +49,11 @@ class TorchHelper(object):
 		self._load_output_dir(args)
 		self._load_opt(args)
 
-	@property
-	def output_dir(self):
-		return self._output_dir
+		self.record_path = os.path.join(self._output_dir, 'record.txt')
+
+		self._set_gpu()
+		self._config_logging()
+		self._load_epoch()
 
 	def _load_output_dir(self, args):
 		# 确定输出目录，默认起一个时间
@@ -84,30 +100,144 @@ class TorchHelper(object):
 			lake.file.write(option_json, self._option_path)
 			print('从option_{}加载option'.format(option_name))
 
-	def save_model(self, model, name):
-		save_path = os.path.join(self._output_dir, '{}.pth'.format(name))
-		if os.path.isfile(save_path):
-			raise ValueError('{}模型已存在，不能覆盖'.format(save_path))
-		# is_cuda = model.is_cuda
-		torch.save(model.state_dict(), save_path)
-		# if is_cuda:
-			# model.cuda()
+	def _set_gpu(self):
+		if torch.cuda.is_available():
+			torch_network.set_default_gpu_ids([int(item) for item in self.opt.gpu_ids])
 
-	def load_model(self, model, name=None):
-		name = name or self.opt.model_load_name
-		if name and len(name) > 0:
-			model_path = os.path.json(self._output_dir, '%d.pth' % self.opt.model_load_name)
-			if not os.path.isfile(model_path):
-				raise ValueError('你想加载的模型%s不存在' % model_path)
+	def _config_logging(self):
+		log_path = self._output_dir + 'train.log'
+		format = '%(asctime)s - %(levelname)s - %(name)s[line:%(lineno)d]: %(message)s'
+
+		# 文件记录
+		logging.basicConfig(
+				filename = log_path,
+				filemode = 'a',
+				level = logging.INFO,
+				format = format)
+
+		# 控制台输出
+		if self.log_to_console:
+			root = logging.getLogger()
+			ch = logging.StreamHandler(sys.stdout)
+			ch.setLevel(logging.INFO)
+			formatter = logging.Formatter(format)
+			ch.setFormatter(formatter)
+			root.addHandler(ch)
+
+		self._logger = logging.getLogger(__name__)
+
+	@property
+	def model(self):
+		return self._model
+
+	def init_weight(self, model):
+		init_weight(model)
+
+	@model.setter
+	def model(self, value):
+		self._model = value
+		self.init_weight(self._model)
+		self._model.output_dir = self._output_dir
+		try:
+			if self._epoch_to_load is not None:
+				model_path = os.path.join(self._output_dir, '%d.pth' % self._epoch_to_load)
+				if not os.path.isfile(model_path):
+					raise ValueError('你想加载的模型%s不存在' % model_path)
 			else:
-				model.load_state_dict(torch.load(model_path))
-				print('模型{}加载成功'.format(model_path))
-		else:
-			print('模型未加载')
+				model_path = self.last_model_path()
+			if model_path is not None:
+				print(model_path)
+				self._model.load_state_dict(torch.load(model_path))
+				self._logger.info('模型{}加载成功'.format(model_path))
+			else:
+				self._logger.info('模型未加载')
+		except Exception as e:
+			print(e)
+			self._logger.info('模型加载出错')
+			self.epoch = 1
 
-	def default_optimizer(self, model):
-		optimizer = torch.optim.Adam(model.parameters(), lr=self.opt.lr, weight_decay=self.opt.weight_decay)
+	def _load_epoch(self):
+		self.epoch = 1
+		if os.path.exists(self.record_path):
+			records = lake.file.read(self.record_path)
+			if len(records) > 0 and len(records[-1].strip()) > 0:
+				self.epoch = int(json.loads(records[-1])['epoch'])
+
+	def default_optimizer(self):
+		optimizer = torch.optim.Adam(
+				self._model.parameters(),
+				lr=self.opt.lr,
+				weight_decay=self.opt.weight_decay)
 		return optimizer
+
+	def _reset_record(self):
+		self._epoch_records = defaultdict(list)
+		self._epoch_start = time.time()
+
+	def add_record(self, key, value):
+		self._epoch_records[key].append(value)
+
+	def add_records(self, records):
+		for key, value in records.items():
+			self.add_record(key, value)
+
+	def _epoch_log(self, values):
+		results = ['epoch: %d' % self.epoch]
+		for key, value in values.items():
+			if key != 'epoch':
+				value = ('%.6f' % value) if isinstance(value, float) else str(value)
+				results.append('%s: %s' % (key, value))
+		self._logger.info('   '.join(results))
+
+	def _store_record(self):
+		if self.epoch % self.opt.print_per == 0:
+			rdf = lambda x: round(x, 6)
+			values = {}
+			for key, value in self._epoch_records.items():
+				if isinstance(value[0], (int, float)):
+					value = rdf(np.mean(value))
+				else:
+					value = value[-1]
+				values[key] = value
+				values['epoch'] = self.epoch
+			if hasattr(self, 'current_lr'):
+				values['lr'] = self.current_lr
+			values['time'] = rdf(time.time() - self._epoch_start)
+			self._epoch_log(values)
+			record_json = json.dumps(values)
+			lake.file.add_line(record_json, self.record_path)
+			self._reset_record()
+
+
+	def new_model_path(self):
+		path = os.path.join(self._output_dir, '%d.pth' % self.epoch)
+		if os.path.isfile(path):
+			raise ValueError('模型已经存在，不能覆盖保存')
+		return path
+
+	def last_model_path(self):
+		paths = lake.dir.loop(self._output_dir, ['.pth'])
+		if len(paths) > 0:
+			epochs = np.array([int(os.path.basename(x).split('.')[0]) for x in paths])
+			index = np.argmax(epochs)
+			path = paths[index]
+			return path
+		else:
+			return None
+
+	def step(self):
+		if self.epoch % self.opt.save_per == 0:
+			torch.save(self._model.state_dict(), self.new_model_path())
+			self.add_record('save', 1)
+		self._store_record()
+		self.epoch += 1
+
+	def train_stop(self):
+		self._model.save_network(self.new_model_path())
+		self._logger.info('train finish')
+
+	def finished(self):
+		return self.epoch >= self.opt.epochs
 
 
 def _init_weight(m):
@@ -134,7 +264,11 @@ def _init_weight(m):
 		pass
 
 def init_weight(model):
-	self.apply(_init_weight)
+	model.apply(_init_weight)
+
+
+
+
 
 
 
