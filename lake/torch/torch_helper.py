@@ -86,12 +86,12 @@ class TorchHelper(object):
 
 	def save_model(self, model, name):
 		save_path = os.path.join(self._output_dir, '{}.pth'.format(name))
-		if not os.path.isfile(save_path):
-			raise ValueError('{}模型已存在，不能覆盖' % path)
-		is_cuda = model.use_cuda
-		torch.save(model.cpu().state_dict(), save_path)
-		if is_cuda:
-			model.cuda()
+		if os.path.isfile(save_path):
+			raise ValueError('{}模型已存在，不能覆盖'.format(save_path))
+		# is_cuda = model.is_cuda
+		torch.save(model.state_dict(), save_path)
+		# if is_cuda:
+			# model.cuda()
 
 	def load_model(self, model, name=None):
 		name = name or self.opt.model_load_name
