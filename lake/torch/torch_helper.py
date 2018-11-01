@@ -35,6 +35,10 @@ class TorchHelper(object):
 		self._load_output_dir(args)
 		self._load_opt(args)
 
+	@property
+	def output_dir(self):
+		return self._output_dir
+
 	def _load_output_dir(self, args):
 		# 确定输出目录，默认起一个时间
 		# 命令行参数 > 传参 > 默认
@@ -81,7 +85,7 @@ class TorchHelper(object):
 			print('从option_{}加载option'.format(option_name))
 
 	def save_model(self, model, name):
-		save_path = os.path.join(self._output_dir, '%d.pth' % name)
+		save_path = os.path.join(self._output_dir, '{}.pth'.format(name))
 		if not os.path.isfile(save_path):
 			raise ValueError('{}模型已存在，不能覆盖' % path)
 		is_cuda = model.use_cuda
