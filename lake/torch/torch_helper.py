@@ -87,7 +87,6 @@ class TorchHelper(object):
 			if len(args.option) > 0:
 				option_name = args.option
 			elif self._option_name is not None:
-				print(self._option_name)
 				option_name = self._option_name
 			else:
 				option_name = 'base'
@@ -105,26 +104,12 @@ class TorchHelper(object):
 			torch_network.set_default_gpu_ids([int(item) for item in self.opt.gpu_ids])
 
 	def _config_logging(self):
-		log_path = self._output_dir + 'train.log'
-		format = '%(asctime)s - %(levelname)s - %(name)s[line:%(lineno)d]: %(message)s'
-
-		# 文件记录
-		logging.basicConfig(
-				filename = log_path,
-				filemode = 'a',
-				level = logging.INFO,
-				format = format)
-
-		# 控制台输出
-		if self.log_to_console:
-			root = logging.getLogger()
-			ch = logging.StreamHandler(sys.stdout)
-			ch.setLevel(logging.INFO)
-			formatter = logging.Formatter(format)
-			ch.setFormatter(formatter)
-			root.addHandler(ch)
-
 		self._logger = logging.getLogger(__name__)
+		fh = logging.FileHandler(os.path.join(self._output_dir, 'train.log'))
+		fh.setLevel(logging.INFO)
+		formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s[line:%(lineno)d]: %(message)s')
+		fh.setFormatter(formatter)
+		self._logger.addHandler(fh)
 
 	@property
 	def model(self):
@@ -142,18 +127,17 @@ class TorchHelper(object):
 			if self._epoch_to_load is not None:
 				model_path = os.path.join(self._output_dir, '%d.pth' % self._epoch_to_load)
 				if not os.path.isfile(model_path):
-					raise ValueError('你想加载的模型%s不存在' % model_path)
+					raise ValueError('model %s not exits' % model_path)
 			else:
 				model_path = self.last_model_path()
 			if model_path is not None:
-				print(model_path)
 				self._model.load_state_dict(torch.load(model_path))
-				self._logger.info('模型{}加载成功'.format(model_path))
+				self._logger.info(u'model {} load successfully'.format(model_path))
 			else:
-				self._logger.info('模型未加载')
+				self._logger.info(u'model not load')
 		except Exception as e:
 			print(e)
-			self._logger.info('模型加载出错')
+			self._logger.info(u'model error')
 			self.epoch = 1
 
 	def _load_epoch(self):
