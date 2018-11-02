@@ -152,6 +152,8 @@ class TorchHelper(object):
 				self._model.parameters(),
 				lr=self.opt.lr,
 				weight_decay=self.opt.weight_decay)
+		for group in optimizer.param_groups:
+			group.setdefault('initial_lr', self.opt.lr)
 		return optimizer
 
 	def _reset_record(self):
