@@ -140,6 +140,31 @@ class TorchHelper(object):
 			self._logger.info(u'model error')
 			self.epoch = 1
 
+	# 保存最好模型等操作
+	@property
+	def best_model_path():
+		return os.path.join(self._output_dir, 'best.pth')
+
+	def load_best_model(self):
+		model_path = self.best_model_path
+		if os.path.isfile(model_path):
+			checkpoint = torch.load(model_path)
+			self._model.load_state_dict(checkpoint['model'])
+			return checkpoint['info']
+		else:
+			return None
+
+	def save_best_model(self):
+		checkpoint = {}
+		checkpoint['model'] = net.state_dict()
+		checkpoint['info'] = info
+		torch.save(checkpoint, self.best_model_path)
+
+	def try_save_best_model(self, max_criteria, info):
+		if not hasattr(self, 'max_criteria') or max_criteria > self.max_criteria
+			self.max_criteria = max_criteria
+			self.save_best_model(info)
+
 	def _load_epoch(self):
 		self.epoch = 1
 		if os.path.exists(self.record_path):
@@ -155,6 +180,10 @@ class TorchHelper(object):
 		for group in optimizer.param_groups:
 			group.setdefault('initial_lr', self.opt.lr)
 		return optimizer
+
+	def reset_lr(self, optimizer, lr):
+		for group in optimizer.param_groups:
+			group.setdefault('lr', lr)
 
 	def _reset_record(self):
 		self._epoch_records = defaultdict(list)
