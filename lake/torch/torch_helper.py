@@ -142,7 +142,7 @@ class TorchHelper(object):
 
 	# 保存最好模型等操作
 	@property
-	def best_model_path():
+	def best_model_path(self):
 		return os.path.join(self._output_dir, 'best.pth')
 
 	def load_best_model(self):
@@ -154,16 +154,16 @@ class TorchHelper(object):
 		else:
 			return None
 
-	def save_best_model(self):
+	def _save_best_model(self, info):
 		checkpoint = {}
-		checkpoint['model'] = net.state_dict()
+		checkpoint['model'] = self._model.state_dict()
 		checkpoint['info'] = info
 		torch.save(checkpoint, self.best_model_path)
 
 	def try_save_best_model(self, max_criteria, info):
-		if not hasattr(self, 'max_criteria') or max_criteria > self.max_criteria
+		if not hasattr(self, 'max_criteria') or max_criteria > self.max_criteria:
 			self.max_criteria = max_criteria
-			self.save_best_model(info)
+			self._save_best_model(info)
 
 	def _load_epoch(self):
 		self.epoch = 1
@@ -172,13 +172,14 @@ class TorchHelper(object):
 			if len(records) > 0 and len(records[-1].strip()) > 0:
 				self.epoch = int(json.loads(records[-1])['epoch'])
 
-	def default_optimizer(self):
-		optimizer = torch.optim.Adam(
-				self._model.parameters(),
-				lr=self.opt.lr,
-				weight_decay=self.opt.weight_decay)
+	def default_optimizer(self, opt_type=None):
+		opt = self.opt
+		if opt_type == 'adam':
+			optimizer = torch.optim.Adam(self._model.parameters(), lr=opt.lr, weight_decay=opt.weight_decay)
+		else:
+			optimizer = torch.optim.SGD(self._model.parameters(), lr=opt.lr, momentum=opt.momentum, weight_decay=opt.weight_decay)
 		for group in optimizer.param_groups:
-			group.setdefault('initial_lr', self.opt.lr)
+			group.setdefault('initial_lr', opt.lr)
 		return optimizer
 
 	def reset_lr(self, optimizer, lr):
@@ -195,6 +196,9 @@ class TorchHelper(object):
 	def add_records(self, records):
 		for key, value in records.items():
 			self.add_record(key, value)
+
+	def mean_record(self, key):
+		return np.mean(self._epoch_records[key])
 
 	def _epoch_log(self, values):
 		results = ['epoch: %d' % self.epoch]
