@@ -238,7 +238,7 @@ class TorchHelper(object):
 	def last_model_path(self):
 		paths = lake.dir.loop(self._output_dir, ['.pth'])
 		to_name = lambda x: os.path.basename(x).split('.')[0]
-		paths = filter(lambda x: to_name(x).isdigit(), paths)
+		paths = list(filter(lambda x: to_name(x).isdigit(), paths))
 		if len(paths) > 0:
 			epochs = np.array([int(to_name(x)) for x in paths])
 			index = np.argmax(epochs)
