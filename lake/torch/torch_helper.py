@@ -15,6 +15,7 @@ import time
 from . import network as torch_network
 import numpy as np
 from collections import defaultdict
+import traceback
 
 
 class TorchHelper(object):
@@ -136,7 +137,7 @@ class TorchHelper(object):
 			else:
 				self._logger.info(u'model not load')
 		except Exception as e:
-			print(e)
+			traceback.print_exc(file=sys.stdout)
 			self._logger.info(u'model error')
 			self.epoch = 1
 
