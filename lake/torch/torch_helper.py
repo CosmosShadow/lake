@@ -173,12 +173,13 @@ class TorchHelper(object):
 			if len(records) > 0 and len(records[-1].strip()) > 0:
 				self.epoch = int(json.loads(records[-1])['epoch'])
 
-	def default_optimizer(self, opt_type=None):
+	def default_optimizer(self, params=None, opt_type=None):
 		opt = self.opt
+		params = params or self._model.parameters()
 		if opt_type == 'adam':
-			optimizer = torch.optim.Adam(self._model.parameters(), lr=opt.lr, weight_decay=opt.weight_decay)
+			optimizer = torch.optim.Adam(params, lr=opt.lr, weight_decay=opt.weight_decay)
 		else:
-			optimizer = torch.optim.SGD(self._model.parameters(), lr=opt.lr, momentum=opt.momentum, weight_decay=opt.weight_decay)
+			optimizer = torch.optim.SGD(params, lr=opt.lr, momentum=opt.momentum, weight_decay=opt.weight_decay)
 		for group in optimizer.param_groups:
 			group.setdefault('initial_lr', opt.lr)
 		return optimizer
