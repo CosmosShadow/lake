@@ -268,12 +268,13 @@ def _init_weight(m):
 		m.weight.data.normal_(1.0, 0.02)
 		m.bias.data.fill_(0)
 	elif classname.find('Conv') != -1:
-		weight_shape = list(m.weight.data.size())
-		fan_in = np.prod(weight_shape[1:4])
-		fan_out = np.prod(weight_shape[2:4]) * weight_shape[0]
-		w_bound = np.sqrt(6. / (fan_in + fan_out))
-		m.weight.data.uniform_(-w_bound, w_bound)
-		if m.bias is not None:
+		if hasattr(m, 'weight') and m.weight is not None:
+			weight_shape = list(m.weight.data.size())
+			fan_in = np.prod(weight_shape[1:4])
+			fan_out = np.prod(weight_shape[2:4]) * weight_shape[0]
+			w_bound = np.sqrt(6. / (fan_in + fan_out))
+			m.weight.data.uniform_(-w_bound, w_bound)
+		if hasattr(m, 'bias') and m.bias is not None:
 			m.bias.data.fill_(0)
 	elif classname.find('Linear') != -1:
 		weight_shape = list(m.weight.data.size())
