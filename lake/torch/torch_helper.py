@@ -256,7 +256,7 @@ class TorchHelper(object):
 		self.epoch += 1
 
 	def train_stop(self):
-		self._model.save_network(self.new_model_path())
+		torch.save(self._model.state_dict(), self.new_model_path())
 		self._logger.info('train finish')
 
 	def finished(self):
