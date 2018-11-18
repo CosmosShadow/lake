@@ -232,8 +232,8 @@ class TorchHelper(object):
 
 	def new_model_path(self):
 		path = os.path.join(self._output_dir, '%d.pth' % self.epoch)
-		# if os.path.isfile(path):
-		# 	raise ValueError('模型已经存在，不能覆盖保存')
+		if os.path.isfile(path):
+			raise ValueError('模型已经存在，不能覆盖保存')
 		return path
 
 	def last_model_path(self):
