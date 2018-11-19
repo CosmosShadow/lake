@@ -171,7 +171,7 @@ class TorchHelper(object):
 		if os.path.exists(self.record_path):
 			records = lake.file.read(self.record_path)
 			if len(records) > 0 and len(records[-1].strip()) > 0:
-				self.epoch = int(json.loads(records[-1])['epoch'])
+				self.epoch = int(json.loads(records[-1])['epoch']) + 1
 
 	def default_optimizer(self, params=None, opt_type=None):
 		opt = self.opt
