@@ -46,21 +46,36 @@ def simplest_str_2_datetime(date_str):
 	return datetime.datetime.strptime(date_str, simplest_datetime_format)
 
 
-class LakeTimer():
-	def __init__(self, name=None, show=True):
-		self._show = show
-		self._name = name
+class Timer(object):
+	"""A simple timer."""
+	def __init__(self):
+		self.total_time = 0.
+		self.calls = 0
+		self.start_time = 0.
+		self.diff = 0.
+		self.average_time = 0.
 
-	def __enter__(self):
-		self.start = time.time()
+	def tic(self):
+		# using time.time instead of time.clock because time time.clock
+		# does not normalize for multithreading
+		self.start_time = time.time()
 
-	def time(self):
-		return time.time() - self.start
+	def toc(self, average=False):
+		self.diff = time.time() - self.start_time
+		self.total_time += self.diff
+		self.calls += 1
+		if average:
+			self.average_time = self.total_time / self.calls
+			return self.average_time
+		else:
+			return self.diff
 
-	def __exit__(self, a, b, c):
-		if self._show:
-			name = self._name or ''
-			print("{} time-cost: {:.6f}".format(name, self.time()))
+	def clear(self):
+		self.total_time = 0.
+		self.calls = 0
+		self.start_time = 0.
+		self.diff = 0.
+		self.average_time = 0.
 
 
 if __name__ == '__main__':
