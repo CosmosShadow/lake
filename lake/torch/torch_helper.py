@@ -108,8 +108,12 @@ class TorchHelper(object):
 		self._logger = logging.getLogger(__name__)
 		fh = logging.FileHandler(os.path.join(self._output_dir, 'train.log'))
 		fh.setLevel(logging.INFO)
+		ch = logging.StreamHandler()
+		ch.setLevel(logging.DEBUG)
 		formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s[line:%(lineno)d]: %(message)s')
 		fh.setFormatter(formatter)
+		ch.setFormatter(formatter)
+		self._logger.addHandler(ch)
 		self._logger.addHandler(fh)
 
 	@property
@@ -131,6 +135,7 @@ class TorchHelper(object):
 					raise ValueError('model %s not exits' % model_path)
 			else:
 				model_path = self.last_model_path()
+				self._logger.debug(u'load the last model {}'.format(model_path))
 			if model_path is not None:
 				self._model.load_state_dict(torch.load(model_path))
 				self._logger.info(u'model {} load successfully'.format(model_path))

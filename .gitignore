@@ -2,3 +2,5 @@ lake.egg-info/*
 dist/*
 *.pyc
 build/*
+.idea
+.cache
