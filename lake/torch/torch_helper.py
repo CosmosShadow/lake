@@ -7,6 +7,7 @@ import json
 import argparse
 import lake.dir
 import lake.file
+from lake.option.optionParser import optionParser
 import torch
 import logging
 import numpy as np
@@ -43,19 +44,20 @@ class TorchHelper(object):
 		parser.add_argument('--option', type=str, default='', help='option')
 		parser.add_argument('--output', type=str, default='', help='output')
 		args, unknown = parser.parse_known_args()
-		return args
+		# args = parser.parse_args()
+		return args, unknown
 
 	def _load(self):
-		args = self._parse_args()
+		args, unknown = self._parse_args()
 		self._load_output_dir(args)
-		self._load_opt(args)
+		self._load_opt(args, unknown)
 
 		self.record_path = os.path.join(self._output_dir, 'record.txt')
 
 		self._set_gpu()
 		self._config_logging()
 		self._load_epoch()
-
+	# 设置self.output self._output_dir  self._outputs_path
 	def _load_output_dir(self, args):
 		# 确定输出目录，默认起一个时间
 		# 命令行参数 > 传参 > 默认
@@ -66,11 +68,12 @@ class TorchHelper(object):
 		else:
 			self.output = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
 
-		self._output_dir  = os.path.join(self._outputs_path, self.output)
+		self._output_dir = os.path.join(self._outputs_path, self.output)
 		lake.dir.mk(self._outputs_path)
 		lake.dir.mk(self._output_dir)
 
-	def _load_opt(self, args):
+	# 设置self.opt
+	def _load_opt(self, args, unknown):
 		"""加载option，顺序为:
 		1、使用保存目录里的
 		2、使用命令行指定的
@@ -78,27 +81,39 @@ class TorchHelper(object):
 		后两者需要保存到_output_dir目录下
 		"""
 		self._option_path = os.path.join(self._output_dir, 'option.json')
-		if os.path.exists(self._option_path):
-			option_json = lake.file.read(self._option_path)
-			option_dict = json.loads(option_json)
-			self.opt = recordtype('X', option_dict.keys())(*option_dict.values())
-			print('从{}加载option'.format(self._option_path))
+		sys.path.append('options')
+		if len(args.option) > 0:
+			option_name = args.option
+		elif self._option_name is not None:
+			option_name = self._option_name
 		else:
-			# _option_name: 命令行 > 传参 > 默认
-			if len(args.option) > 0:
-				option_name = args.option
-			elif self._option_name is not None:
-				option_name = self._option_name
-			else:
-				option_name = 'base'
-				
-			sys.path.append('options')
-			opt_pkg = __import__('option_' + option_name)
-			self.opt = opt_pkg.Options()()
-			self.opt.option_name = option_name
-			option_json = json.dumps(vars(self.opt), indent=4)
-			lake.file.write(option_json, self._option_path)
-			print('从option_{}加载option'.format(option_name))
+			option_name = 'base'
+		opt_pkg = __import__('option_' + option_name)
+		self.opt = optionParser(opt_pkg.Options(), self._option_path, args, unknown)
+
+		# self._option_path = os.path.join(self._output_dir, 'option.json')
+		# if os.path.exists(self._option_path):
+		# 	option_json = lake.file.read(self._option_path)
+		# 	option_dict = json.loads(option_json)
+		# 	# 文件转化为配置参数
+		# 	self.opt = recordtype('X', option_dict.keys())(*option_dict.values())
+		# 	print('从{}加载option'.format(self._option_path))
+		# else:
+		# 	# _option_name: 命令行 > 传参 > 默认
+		# 	if len(args.option) > 0:
+		# 		option_name = args.option
+		# 	elif self._option_name is not None:
+		# 		option_name = self._option_name
+		# 	else:
+		# 		option_name = 'base'
+		#
+		# 	sys.path.append('options')
+		# 	opt_pkg = __import__('option_' + option_name)
+		# 	self.opt = opt_pkg.Options()()
+		# 	self.opt.option_name = option_name
+		# 	option_json = json.dumps(vars(self.opt), indent=4)
+		# 	lake.file.write(option_json, self._option_path)
+		# 	print('从option_{}加载option'.format(option_name))
 
 	def _set_gpu(self):
 		if torch.cuda.is_available():
