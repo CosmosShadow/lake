@@ -75,8 +75,8 @@ class TorchHelper(object):
 	# 设置self.opt
 	def _load_opt(self, args, unknown):
 		"""加载option，顺序为:
-		1、使用保存目录里的
-		2、使用命令行指定的
+		1、使用命令行指定的
+		2、使用保存目录里的
 		3、默认: option_base
 		后两者需要保存到_output_dir目录下
 		"""
@@ -277,12 +277,14 @@ class TorchHelper(object):
 	def finished(self):
 		return self.epoch >= self.opt.epochs
 
-
+# 已经验证此方法有效
 def _init_weight(m):
 	classname = m.__class__.__name__
-	if classname.find('BatchNorm2d') != -1 or  classname.find('InstanceNorm2d') != -1:
+	if classname.find('BatchNorm2d') != -1 or classname.find('InstanceNorm2d') != -1:
+		# 权重初始化为均值为0标准差为0.02，即基本保持归一化后的分布
 		m.weight.data.normal_(1.0, 0.02)
 		m.bias.data.fill_(0)
+	# xavier初始化
 	elif classname.find('Conv') != -1:
 		if hasattr(m, 'weight') and m.weight is not None:
 			weight_shape = list(m.weight.data.size())
