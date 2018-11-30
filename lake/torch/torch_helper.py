@@ -57,6 +57,7 @@ class TorchHelper(object):
 		self._set_gpu()
 		self._config_logging()
 		self._load_epoch()
+
 	# 设置self.output self._output_dir  self._outputs_path
 	def _load_output_dir(self, args):
 		# 确定输出目录，默认起一个时间

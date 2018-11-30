@@ -6,6 +6,7 @@ import lake.file
 import lake.dir
 import json
 from recordtype import recordtype
+import torch
 
 def optionParser(net_option, option_path, args, unknown):
     """description
@@ -36,12 +37,18 @@ def optionParser(net_option, option_path, args, unknown):
     else:
         opt = net_option()
         opt.option_name = args.option
+        set_num_workers(opt)
         option_json = json.dumps(vars(opt), indent=4)
         lake.file.write(option_json, option_path)
         print('从option_{}加载option'.format(opt.option_name))
 
     return opt
 
+
+# 配置数据加载线程
+def set_num_workers(option):
+    gpuCount = torch.cuda.device_count()
+    if option.num_workers == 0: option.num_workers = gpuCount
 
 if __name__ == '__main__':
     pass
