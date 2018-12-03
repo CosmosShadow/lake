@@ -50,11 +50,11 @@ class TorchHelper(object):
 
 	def _load(self):
 		args, unknown = self._parse_args()
+
 		self._load_output_dir(args)
 		self._load_opt(args, unknown)
 
 		self.record_path = os.path.join(self._output_dir, 'record.txt')
-		if args.epoch_to_load: self._epoch_to_load = args.epoch_to_load
 
 		self._set_gpu()
 		self._config_logging()
@@ -64,12 +64,34 @@ class TorchHelper(object):
 	def _load_output_dir(self, args):
 		# 确定输出目录，默认起一个时间
 		# 命令行参数 > 传参 > 默认
-		if len(args.output) > 0:
-			self.output = args.output
-		elif self._output is not None:
-			self.output = self._output
+		# if len(args.output) > 0:
+		# 	self.output = args.output
+		# elif self._output is not None:
+		# 	self.output = self._output
+		# else:
+		# 	self.output = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
+		#
+		# self._output_dir = os.path.join(self._outputs_path, self.output)
+		# lake.dir.mk(self._outputs_path)
+		# lake.dir.mk(self._output_dir)
+		self._epoch_to_load = args.epoch_to_load
+		if self._epoch_to_load:
+			if len(args.output) < 0:
+				raise Exception("There is no model to load!")
+			else:
+				if self._output is not None:
+					self._epoch_to_load_path = self._output
+				else:
+					self._epoch_to_load_path = args.output
+				self.output = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
+				self._epoch_to_load_path = os.path.join(self._outputs_path, self._epoch_to_load_path)
 		else:
-			self.output = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
+			if len(args.output) > 0:
+				self.output = args.output
+			elif self._output is not None:
+				self.output = self._output
+			else:
+				self.output = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
 
 		self._output_dir = os.path.join(self._outputs_path, self.output)
 		lake.dir.mk(self._outputs_path)
@@ -143,8 +165,8 @@ class TorchHelper(object):
 		self.init_weight(self._model)
 		self._model.output_dir = self._output_dir
 		try:
-			if self._epoch_to_load is not None:
-				model_path = os.path.join(self._output_dir, '%d.pth' % self._epoch_to_load)
+			if self._epoch_to_load:
+				model_path = os.path.join(self._epoch_to_load_path, '%d.pth' % self.opt.epoch_to_load)
 				print("Load model from: " + model_path)
 				if not os.path.isfile(model_path):
 					raise ValueError('model %s not exits' % model_path)
@@ -187,6 +209,10 @@ class TorchHelper(object):
 
 	def _load_epoch(self):
 		self.epoch = 1
+		if self._epoch_to_load:
+			self.epoch = self.opt.epoch_to_load + 1
+			print("Afetr load model by epoch, start train from epoch: " + str(self.epoch))
+			return
 		if os.path.exists(self.record_path):
 			records = lake.file.read(self.record_path)
 			if len(records) > 0 and len(records[-1].strip()) > 0:
