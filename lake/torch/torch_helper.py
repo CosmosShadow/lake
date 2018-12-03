@@ -43,6 +43,7 @@ class TorchHelper(object):
 		parser = argparse.ArgumentParser()
 		parser.add_argument('--option', type=str, default='', help='option')
 		parser.add_argument('--output', type=str, default='', help='output')
+		parser.add_argument('--epoch_to_load', type=int, default=None, help='epoch_to_load')
 		args, unknown = parser.parse_known_args()
 		# args = parser.parse_args()
 		return args, unknown
@@ -53,6 +54,7 @@ class TorchHelper(object):
 		self._load_opt(args, unknown)
 
 		self.record_path = os.path.join(self._output_dir, 'record.txt')
+		if args.epoch_to_load: self._epoch_to_load = args.epoch_to_load
 
 		self._set_gpu()
 		self._config_logging()
@@ -143,6 +145,7 @@ class TorchHelper(object):
 		try:
 			if self._epoch_to_load is not None:
 				model_path = os.path.join(self._output_dir, '%d.pth' % self._epoch_to_load)
+				print("Load model from: " + model_path)
 				if not os.path.isfile(model_path):
 					raise ValueError('model %s not exits' % model_path)
 			else:
