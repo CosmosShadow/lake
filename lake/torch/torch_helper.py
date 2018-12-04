@@ -64,16 +64,6 @@ class TorchHelper(object):
 	def _load_output_dir(self, args):
 		# 确定输出目录，默认起一个时间
 		# 命令行参数 > 传参 > 默认
-		# if len(args.output) > 0:
-		# 	self.output = args.output
-		# elif self._output is not None:
-		# 	self.output = self._output
-		# else:
-		# 	self.output = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
-		#
-		# self._output_dir = os.path.join(self._outputs_path, self.output)
-		# lake.dir.mk(self._outputs_path)
-		# lake.dir.mk(self._output_dir)
 		self._epoch_to_load = args.epoch_to_load
 		if self._epoch_to_load:
 			if len(args.output) < 0:
@@ -113,32 +103,12 @@ class TorchHelper(object):
 			option_name = self._option_name
 		else:
 			option_name = 'base'
-		opt_pkg = __import__('option_' + option_name)
-		self.opt = optionParser(opt_pkg.Options(), self._option_path, args, unknown)
-
-		# self._option_path = os.path.join(self._output_dir, 'option.json')
-		# if os.path.exists(self._option_path):
-		# 	option_json = lake.file.read(self._option_path)
-		# 	option_dict = json.loads(option_json)
-		# 	# 文件转化为配置参数
-		# 	self.opt = recordtype('X', option_dict.keys())(*option_dict.values())
-		# 	print('从{}加载option'.format(self._option_path))
-		# else:
-		# 	# _option_name: 命令行 > 传参 > 默认
-		# 	if len(args.option) > 0:
-		# 		option_name = args.option
-		# 	elif self._option_name is not None:
-		# 		option_name = self._option_name
-		# 	else:
-		# 		option_name = 'base'
-		#
-		# 	sys.path.append('options')
-		# 	opt_pkg = __import__('option_' + option_name)
-		# 	self.opt = opt_pkg.Options()()
-		# 	self.opt.option_name = option_name
-		# 	option_json = json.dumps(vars(self.opt), indent=4)
-		# 	lake.file.write(option_json, self._option_path)
-		# 	print('从option_{}加载option'.format(option_name))
+		if os.path.exists(self._option_path):
+			opt_network = None
+		else:
+			opt_pkg = __import__('option_' + option_name)
+			opt_network = opt_pkg.Options()
+		self.opt = optionParser(opt_network, self._option_path, args, unknown)
 
 	def _set_gpu(self):
 		if torch.cuda.is_available():
