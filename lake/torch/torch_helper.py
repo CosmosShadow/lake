@@ -20,11 +20,13 @@ import traceback
 
 
 class TorchHelper(object):
-	def __init__(self, outputs_path = './outputs/', output=None, option_name=None, log_to_console=False, epoch_to_load=None):
+	def __init__(self, outputs_path = './outputs/', output=None, option_dir='options', option_name=None, log_to_console=False, epoch_to_load=None):
 		"""description
 		Args:
 			log_to_console: 显示到命令行，有其它模块设置了logging
 		"""
+		if option_dir is not None:
+			sys.path.append(option_dir)
 		self.log_to_console = log_to_console
 		self._outputs_path = outputs_path
 		self._option_name = option_name
@@ -96,7 +98,6 @@ class TorchHelper(object):
 		后两者需要保存到_output_dir目录下
 		"""
 		self._option_path = os.path.join(self._output_dir, 'option.json')
-		sys.path.append('options')
 		if len(args.option) > 0:
 			option_name = args.option
 		elif self._option_name is not None:
