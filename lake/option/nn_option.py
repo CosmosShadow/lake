@@ -26,6 +26,7 @@ class NNOptions(Options):
 		self.parser.add_argument('--output', type=str, default='', help='only placeholder')
 		self.parser.add_argument('--epoch_to_load', type=int, default=None, help='epoch_to_load')
 		self.parser.add_argument('--model_load_name', type=str, default='', help='')
+		self.parser.add_argument('--finetune_new_class', type=int, default=0, help='')
 
 		self.parser.add_argument('--test_per', type=int, default=100, help='test interval')
 		self.parser.add_argument('--save_per', type=int, default=1e4, help='save interval')
