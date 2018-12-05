@@ -5,7 +5,7 @@ import sys
 import numpy as np
 
 import matplotlib as mpl
-mpl.use('Agg')
+# mpl.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 plt.ioff()
