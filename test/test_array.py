@@ -57,9 +57,16 @@ class TestArray(object):
 		result = lake.array.categorize(data)
 		assert_equal(result, {1: [[1, 2, 3], [1, 2]], 2: [[2, 5]], 3: [[3, 4]]})
 
+	def test_split_index(self):
+		first, second = lake.array.split_index(100, [0.9, 0.1])
+		assert_equal(len(first), 90)
+		assert_equal(len(second), 10)
+		assert_equal(len(set(first + second)), 100)
+
 
 if __name__ == '__main__':
-	TestArray().test_categorize()
+	# TestArray().test_categorize()
+	TestArray().test_split_index()
 
 
 

@@ -11,7 +11,7 @@ def split_index(count, rates):
 	datas = []
 	start = 0
 	for rate in rates:
-		step = int(np.floor(rate * count))
+		step = int(rate * count)
 		data = indices[start: start + step]
 		start += step
 		datas.append(data)
