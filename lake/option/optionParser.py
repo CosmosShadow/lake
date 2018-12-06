@@ -26,12 +26,14 @@ def optionParser(net_option, option_path, args, unknown):
 	if os.path.exists(option_path):
 		option_json = lake.file.read(option_path)
 		option_dict = json.loads(option_json)
-		# 命令行参数覆盖
-		if len(unknown) > 0:
-			for unknown_arg in unknown:
-				key = unknown_arg.split('=')[0][2:]
-				value = unknown_arg.split('=')[1]
-				option_dict[key] = value
+		# # 命令行参数覆盖
+		# print(unknown)
+		# exit()
+		# if len(unknown) > 0:
+		# 	for unknown_arg in unknown:
+		# 		key = unknown_arg.split('=')[0][2:]
+		# 		value = unknown_arg.split('=')[1]
+		# 		option_dict[key] = value
 		# 文件转化为配置参数
 		opt = recordtype('X', option_dict.keys())(*option_dict.values())
 		print('从{}加载option'.format(option_path))
