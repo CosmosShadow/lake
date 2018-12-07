@@ -30,9 +30,9 @@ def add_line(line, path):
 		text_file.write(str(line) + '\n')
 
 
-def new_adder(save_path, mode='new'):
+def new_adder(save_path, create_new=False):
 	# 产生一个添加器
-	if mode == 'new':
+	if create_new:
 		rm(save_path)
 	def add_line(*args):
 		for x in args:
