@@ -174,7 +174,7 @@ class TorchHelper(object):
 		torch.save(checkpoint, self.best_model_path)
 
 	def try_save_best_model(self, max_criteria, info):
-		if not hasattr(self, 'max_criteria') or max_criteria > self.max_criteria:
+		if not hasattr(self, 'max_criteria') or max_criteria >= self.max_criteria:
 			self.max_criteria = max_criteria
 			self._save_best_model(info)
 
