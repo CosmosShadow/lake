@@ -7,13 +7,13 @@ import json
 import argparse
 import lake.dir
 import lake.file
+from lake.tm import Timer
 import torch
 import logging
 import numpy as np
 from recordtype import recordtype
 import time
 from . import network as torch_network
-import numpy as np
 
 
 class Trainer(object):
@@ -220,13 +220,13 @@ class Trainer(object):
 	def _test(self):
 		if self.data_test is not None:
 			results = []
-			for _ in range(self.data_test.count(self.opt.batch_size)):
-				batch = self.data_test.next(self.opt.batch_size)
+			for _ in range(self.data_test.count()):
+				batch = self.data_test.next()
 				result = self._model.test_step(self.epoch, batch)
 				results.append(result)
 			results_average = {}
 			for key in results[0].keys():
-				results_average['test_' + key] = np.mean([item[key] for item in results])
+				results_average['test_' + key] = np.mean([item[key] for item in results[0]])
 			self.add_records(results_average)
 			if self.epoch % self.opt.print_per != 0:
 				self._epoch_log(results_average)
@@ -240,23 +240,42 @@ class Trainer(object):
 
 
 	def _train(self):
-		batch = self.data_train.next(self.opt.batch_size) if self.data_train is not None else None
-		train_dict = self._model.train_step(self.epoch, batch)
+		_t = Timer()
+		loop_per_epoch = self.data_train.count()
+		for index in range(loop_per_epoch):
+			batch = self.data_train.next() if self.data_train is not None else None
+			_t.tic()
+			train_dict = self._model.train_step(self.epoch, batch)
+			time_FP = _t.toc()
 
-		if self.optimizer is None:
-			self.add_records(train_dict)
-		else:
-			error = train_dict['loss']
-			self.optimizer.zero_grad()
-			error.backward()
-			if self.opt.clip_grad_norm > 0:
-				torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.opt.clip_grad_norm)
-			self.optimizer.step()
+			if self.optimizer is None:
+				self.add_records(train_dict)
+			else:
+				error = train_dict['loss']
+				self.optimizer.zero_grad()
+				_t.tic()
+				error.backward()
+				time_BP = _t.toc()
+				if self.opt.clip_grad_norm > 0:
+					torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.opt.clip_grad_norm)
+				self.optimizer.step()
 
-			self.add_record('loss', float(error.data.cpu().item()))
-			for key, value in train_dict.items():
-				if key != 'loss':
-					self.add_record(key, value)
+				self.add_record('loss', float(error.data.cpu().item()))
+				for key, value in train_dict.items():
+					if key != 'loss':
+						self.add_record(key, value)
+			records = {
+				'loss': '%07.4f' % (train_dict['loss'].item()),
+				'rpn_class_loss': '%07.4f' % (train_dict['rpn_class_loss']),
+				'rpn_bbox_loss': '%07.4f' % (train_dict['rpn_bbox_loss']),
+				'mrcnn_class_loss': '%07.4f' % (train_dict['mrcnn_class_loss']),
+				'mrcnn_bbox_loss': '%07.4f' % (train_dict['mrcnn_bbox_loss']),
+				'mrcnn_mask_loss': '%07.4f' % (train_dict['mrcnn_mask_loss']),
+				'time_FP': '%04.2f' % (time_FP),
+				'time_BP': '%04.2f' % (time_BP)
+			}
+			if self.opt.debug != 1:
+				print('epoch:{:<3}{:>4}/{:<4}: {}'.format(self.epoch, index + 1, loop_per_epoch, records))
 
 	def new_model_path(self):
 		path = os.path.join(self._output_dir, '%d.pth' % self.epoch)
@@ -288,7 +307,6 @@ class Trainer(object):
 
 			# self._model.train()
 			self._train()
-
 			if self.epoch % self.opt.save_per == 0:
 				self._model.save_network(self.new_model_path())
 				self.add_record('save', 1)

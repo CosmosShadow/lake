@@ -6,7 +6,6 @@ import os.path
 import lake
 import numpy as np
 
-
 def make_dataset(dir):
 	if dir.startswith('~'):
 		dir = dir.replace('~', os.environ['HOME'])
