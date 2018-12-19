@@ -7,7 +7,7 @@ import lake.dir
 import json
 from recordtype import recordtype
 import torch
-
+from torch.distributed import deprecated as dist
 
 def optionParser(net_option, option_path, args, unknown):
 	"""description
@@ -42,7 +42,8 @@ def optionParser(net_option, option_path, args, unknown):
 		opt.option_name = args.option
 		set_num_workers(opt)
 		option_json = json.dumps(vars(opt), indent=4)
-		lake.file.write(option_json, option_path)
+		if dist.get_rank() == 0:
+			lake.file.write(option_json, option_path)
 		print('从option_{}加载option'.format(opt.option_name))
 
 	return opt

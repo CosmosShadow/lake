@@ -17,7 +17,7 @@ from . import network as torch_network
 import numpy as np
 from collections import defaultdict
 import traceback
-
+from torch.distributed import deprecated as dist
 
 class TorchHelper(object):
 	def __init__(self, outputs_path = './outputs/', output=None, option_dir='options', option_name=None, log_to_console=False, epoch_to_load=None):
@@ -44,10 +44,17 @@ class TorchHelper(object):
 		# 解析命令行输入
 		parser = argparse.ArgumentParser()
 		parser.add_argument('--option', type=str, default='', help='option')
+		parser.add_argument("--local_rank", type=int, default=0)
 		parser.add_argument('--output', type=str, default='', help='output')
 		parser.add_argument('--epoch_to_load', type=int, default=None, help='epoch_to_load')
 		args, unknown = parser.parse_known_args()
 		# args = parser.parse_args()
+		num_gpus = int(os.environ["WORLD_SIZE"]) if "WORLD_SIZE" in os.environ else 1
+		self.distributed_flag = num_gpus > 1
+		self.local_rank = args.local_rank
+		# torch.cuda.set_device确保每个进程在GPU上独立工作，分布式区别于多GPU训练
+		torch.cuda.set_device(args.local_rank)
+		torch.distributed.deprecated.init_process_group(backend="nccl", init_method="env://")
 		return args, unknown
 
 	def _load(self):
@@ -265,7 +272,7 @@ class TorchHelper(object):
 			return None
 
 	def step(self):
-		if self.epoch % self.opt.save_per == 0:
+		if self.epoch % self.opt.save_per == 0 and dist.get_rank() == 0:
 			torch.save(self._model.state_dict(), self.new_model_path())
 			self.add_record('save', 1)
 		self._store_record()
