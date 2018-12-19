@@ -124,6 +124,7 @@ class TorchHelper(object):
 
 	def _config_logging(self):
 		self._logger = logging.getLogger(__name__)
+		if dist.get_rank() != 0: return
 		fh = logging.FileHandler(os.path.join(self._output_dir, 'train.log'))
 		fh.setLevel(logging.INFO)
 		formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s[line:%(lineno)d]: %(message)s')
