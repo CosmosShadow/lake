@@ -144,9 +144,11 @@ class TorchHelper(object):
 			else:
 				model_path = self.last_model_path()
 			if model_path is not None:
-				print(self._model.state_dict())
-				print(torch.load(model_path))
-				self._model.load_state_dict(torch.load(model_path))
+				dict_ = torch.load(model_path)
+				_dict = {}
+				for k, v in dict_.items():
+					_dict[k[7:]] = v
+				self._model.load_state_dict(_dict)
 				self._logger.info(u'model {} load successfully'.format(model_path))
 			else:
 				self._logger.info(u'model not load')
