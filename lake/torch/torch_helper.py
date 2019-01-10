@@ -148,6 +148,8 @@ class TorchHelper(object):
 				_dict = {}
 				for k, v in dict_.items():
 					_dict[k[7:]] = v
+				print(_dict)
+				print("*"*150)
 				self._model.load_state_dict(_dict)
 				self._logger.info(u'model {} load successfully'.format(model_path))
 			else:
