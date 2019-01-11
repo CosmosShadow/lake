@@ -17,7 +17,7 @@ from . import network as torch_network
 import numpy as np
 from collections import defaultdict
 import traceback
-
+import torch.nn.init as init
 
 class TorchHelper(object):
 	def __init__(self, outputs_path = './outputs/', output=None, option_dir='options', option_name=None, log_to_console=False, epoch_to_load=None):
@@ -280,30 +280,38 @@ class TorchHelper(object):
 
 # 已经验证此方法有效
 def _init_weight(m):
-	classname = m.__class__.__name__
-	if classname.find('BatchNorm2d') != -1 or classname.find('InstanceNorm2d') != -1:
-		# 权重初始化为均值为0标准差为0.02，即基本保持归一化后的分布
-		m.weight.data.normal_(1.0, 0.02)
-		m.bias.data.fill_(0)
-	# xavier初始化
-	elif classname.find('Conv') != -1:
-		if hasattr(m, 'weight') and m.weight is not None:
-			weight_shape = list(m.weight.data.size())
-			fan_in = np.prod(weight_shape[1:4])
-			fan_out = np.prod(weight_shape[2:4]) * weight_shape[0]
-			w_bound = np.sqrt(6. / (fan_in + fan_out))
-			m.weight.data.uniform_(-w_bound, w_bound)
-		if hasattr(m, 'bias') and m.bias is not None:
-			m.bias.data.fill_(0)
-	elif classname.find('Linear') != -1:
-		weight_shape = list(m.weight.data.size())
-		fan_in = weight_shape[1]
-		fan_out = weight_shape[0]
-		w_bound = np.sqrt(6. / (fan_in + fan_out))
-		m.weight.data.uniform_(-w_bound, w_bound)
-		m.bias.data.fill_(0)
-	else:
-		pass
+	# classname = m.__class__.__name__
+	# if classname.find('BatchNorm2d') != -1 or classname.find('InstanceNorm2d') != -1:
+	# 	# 权重初始化为均值为0标准差为0.02，即基本保持归一化后的分布
+	# 	m.weight.data.normal_(1.0, 0.02)
+	# 	m.bias.data.fill_(0)
+	# # xavier初始化
+	# elif classname.find('Conv') != -1:
+	# 	if hasattr(m, 'weight') and m.weight is not None:
+	# 		weight_shape = list(m.weight.data.size())
+	# 		fan_in = np.prod(weight_shape[1:4])
+	# 		fan_out = np.prod(weight_shape[2:4]) * weight_shape[0]
+	# 		w_bound = np.sqrt(6. / (fan_in + fan_out))
+	# 		m.weight.data.uniform_(-w_bound, w_bound)
+	# 	if hasattr(m, 'bias') and m.bias is not None:
+	# 		m.bias.data.fill_(0)
+	# elif classname.find('Linear') != -1:
+	# 	weight_shape = list(m.weight.data.size())
+	# 	fan_in = weight_shape[1]
+	# 	fan_out = weight_shape[0]
+	# 	w_bound = np.sqrt(6. / (fan_in + fan_out))
+	# 	m.weight.data.uniform_(-w_bound, w_bound)
+	# 	m.bias.data.fill_(0)
+	# else:
+	# 	pass
+	for key in m.state_dict():
+		if key.split('.')[-1] == 'weight':
+			if 'conv' in key:
+				init.kaiming_normal(m.state_dict()[key], mode='fan_out')
+			if 'bn' in key:
+				m.state_dict()[key][...] = 1
+		elif key.split('.')[-1] == 'bias':
+			m.state_dict()[key][...] = 0
 
 def init_weight(model):
 	model.apply(_init_weight)

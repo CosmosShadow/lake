@@ -15,7 +15,7 @@ class NNOptions(Options):
 
 		self.parser.add_argument('--lr', type=float, default=1e-4, help='learning rate')
 		self.parser.add_argument('--clip_grad_norm', type=float, default=0.5, help='grad clip')
-		self.parser.add_argument('--weight_decay', type=float, default=1e-4, help='weight of nn decay')
+		self.parser.add_argument('--weight_decay', type=float, default=5e-4, help='weight of nn decay')
 		self.parser.add_argument('--momentum', type=float, default=0.9, help='weight of nn decay')
 
 		self.parser.add_argument('--lr_decay', type=float, default=0.5, help='weight of nn decay')
