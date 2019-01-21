@@ -1,12 +1,13 @@
 # coding: utf-8
 import csv
 import lake
+from lake.dir import mk as dir_mk
 import json
 import os
 
 
 def write(data, path):
-	lake.dir.mk(path)
+	dir_mk(path)
 	if path.endswith('.csv'):
 		write_csv(data, path)
 	elif path.endswith('.dot') and isinstance(data, list):
