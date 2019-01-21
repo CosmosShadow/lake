@@ -35,11 +35,18 @@ class MySQLClient(object):
 	"""
 	MySQL客户端封装。
 	"""
-	def __init__(self, conf):
+	def __init__(self, conf, pool_count=5):
+		"""
+		Args:
+			conf : 数据连接配制
+			pool_count: 连接池连接数
+		Returns:
+			b : type
+		"""
 		# 增加execute_with_log方法，只需执行一次
 		cursors.Cursor.execute_with_log = execute_with_log
 		try:
-			self._pool = PooledDB(MySQLdb, 5, **conf)
+			self._pool = PooledDB(MySQLdb, pool_count, **conf)
 		except Exception as e:
 			logging.exception(e)
 			exit()
