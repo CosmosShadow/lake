@@ -23,11 +23,13 @@ def execute_with_log(self, sql, data=()):
 	end_time = time.time()
 
 	# 神奇，self._last_executed资源可能被干掉了
-	# if end_time - start_time < 1.0:
-	# 	_logger.info('[SQL %i ms]\n\033[0;32m%s\033[0m', (end_time - start_time) * 1000, self._last_executed)
-	# else:
-	# 	_logger.info('\033[0;31m[SQL %i ms]\n%s\033[0m', (end_time - start_time) * 1000, self._last_executed)
-
+	last_executed = ''
+	if hasattr(self, '_last_executed'):
+		last_executed = self._last_executed[:1000]
+		if end_time - start_time < 1.0:
+			_logger.info('[SQL %i ms]\n\033[0;32m%s\033[0m', (end_time - start_time) * 1000, last_executed)
+		else:
+			_logger.info('\033[0;31m[SQL %i ms]\n%s\033[0m', (end_time - start_time) * 1000, last_executed)
 
 
 @lake.decorator.singleton
