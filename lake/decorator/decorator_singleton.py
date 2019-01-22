@@ -16,8 +16,9 @@ def singleton(cls, *args, **kwargs):
 	"""
 	instances = {}
 	def _singleton(*args, **kwargs):
-		if cls not in instances:
-			instances[cls] = cls(*args, **kwargs)
-		return instances[cls]
+		key = cls.__name__ + "(" + ', '.join('%s=%r' % entry for entry in [("args", list(args)), ("kwargs", kwargs)]) +")"
+		if key not in instances:
+			instances[key] = cls(*args, **kwargs)
+		return instances[key]
 	return _singleton
 
