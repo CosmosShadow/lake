@@ -21,21 +21,21 @@ def pool_local(locals, target, inputs):
 		p.start()
 		ps.append(p)
 
-	print 'all started'
+	print('all started')
 
 	for input_data in inputs:
 		data_q.put(input_data)
 	for _ in range(thread_count):
 		data_q.put('stop')
-	print 'put data finish'
+	print('put data finish')
 
 	datas = []
 	for _ in range(thread_count):
-		print 'index: %d start get' % i
+		print('index: %d start get' % i)
 		datas += return_q.get()
 
 	for i, p in enumerate(ps):
-		print 'index: %d start join' % i
+		print('index: %d start join' % i)
 		p.join()
 
 	return datas
@@ -51,22 +51,22 @@ if __name__ == '__main__':
 			try:
 				image_path = input_q.get(timeout=10.0)
 			except Exception as e:
-				print e
+				print(e)
 				break
 			if image_path == 'stop':
-				print 'get stop'
+				print('get stop')
 				break
 			try:
 				code, same_count = m.is_contain(image_path)
 			except Exception as e:
-				print image_path
-				print e
+				print(image_path)
+				print(e)
 				continue
-			print 'similary: %d   code: %d  image_path: %s' % (same_count, code, image_path)
+			print('similary: %d   code: %d  image_path: %s' % (same_count, code, image_path))
 			result = (image_path, code, same_count)
 			results.append(result)
 		output_q.put(results)
-		print 'inner terminate'
+		print('inner terminate')
 
 
 

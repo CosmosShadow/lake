@@ -116,7 +116,7 @@ class str_load(DBClassBaseLoad):
 
 if __name__ == '__main__':
 	a = DBClass()
-	print a
+	print(a)
 
 
 
