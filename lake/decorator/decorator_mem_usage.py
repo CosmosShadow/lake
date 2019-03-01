@@ -24,7 +24,18 @@ def log_mem_usage(prefix=''):
 	logging.info(message)
 
 
-def mem_usage(prefix=''):
+class MemoryAddOutLimit(MemoryError):
+	"""内存新增超出限制"""
+	def __init__(self, arg=None):
+		super(MemoryAddOutLimit, self).__init__(arg)
+
+
+def mem_usage(prefix='', limit=None):
+	"""内存使用
+	Args:
+		prefix : 前缀
+		limit: 大小限制，单位为M
+	"""
 	def __fun(func):
 		def _fun(*args, **kwargs):
 			past_mem = get_current_mem_usage()
@@ -36,6 +47,10 @@ def mem_usage(prefix=''):
 			new_size = size_2_human(now_mem)
 			logging.info(' 内存状态    函数名: %s%s    原本: %s    新增: %s    最新: %s' % (prefix, func.func_name, past_size, add_size, new_size))
 
+			if limit is not None:
+				usage_in_M = (now_mem - past_mem) / 1024.0 / 1024.0
+				if usage_in_M > limit:
+					raise MemoryAddOutLimit('new memory add {} out of {}'.format(usage_in_M, limit))
 			return ret
 		return _fun
 	return __fun
