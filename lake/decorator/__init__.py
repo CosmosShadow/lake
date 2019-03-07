@@ -7,7 +7,7 @@ from .decorator_singleton import *
 from .decorator_time import *
 from .decorator_args import *
 from .decorator_logging import *
-from .decorator_mem_usage import mem_usage, log_mem_usage
+from .decorator_mem_usage import mem_usage, log_mem_usage, MemoryAddOutLimit
 from .decorator_more_try import more_try
 
 def register_fun(cls):
