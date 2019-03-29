@@ -29,7 +29,7 @@ def write_txt(data, path):
 
 
 def write_csv(data, path, is_excel=False, delimiter=','):
-	with file(path, 'wb') as csvfile:
+	with open(path, 'w') as csvfile:
 		if is_excel:
 			csvfile.write(u"\ufeff")
 		writer = csv.writer(csvfile, delimiter=delimiter)
