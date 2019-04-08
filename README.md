@@ -7,7 +7,7 @@ a python lib for neual network, network, file, and something else
 1. pip install
 
 ```shell
-pip install lake
+pip install lake-1.0
 ```
 
 2. source install
