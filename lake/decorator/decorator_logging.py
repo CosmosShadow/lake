@@ -13,7 +13,7 @@ def logging_fun(log_fun, comment=''):
 	def _deco(func):
 		def __deco(*args, **kwargs):
 			message = {
-				'函数名': func.func_name,
+				'函数名': func.__name__,
 				'注释': comment,
 				'列表参数': json.dumps(args, ensure_ascii=False),
 				'字典参数': json.dumps(kwargs, ensure_ascii=False)

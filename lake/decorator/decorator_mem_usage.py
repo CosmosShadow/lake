@@ -45,7 +45,7 @@ def mem_usage(prefix='', limit=None):
 			past_size = size_2_human(past_mem)
 			add_size = size_2_human(now_mem - past_mem)
 			new_size = size_2_human(now_mem)
-			logging.info(' 内存状态    函数名: %s%s    原本: %s    新增: %s    最新: %s' % (prefix, func.func_name, past_size, add_size, new_size))
+			logging.info(' 内存状态    函数名: %s%s    原本: %s    新增: %s    最新: %s' % (prefix, func.__name__, past_size, add_size, new_size))
 
 			if limit is not None:
 				usage_in_M = (now_mem - past_mem) / 1024.0 / 1024.0

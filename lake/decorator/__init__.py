@@ -13,7 +13,7 @@ from .decorator_more_try import more_try
 def register_fun(cls):
 	"""注册函数func到类cls上"""
 	def register_decorator(func):
-		setattr(cls, func.func_name, func)
+		setattr(cls, func.__name__, func)
 		return func
 	return register_decorator
 

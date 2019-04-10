@@ -2,7 +2,7 @@
 
 def dump_args(func):
 	argnames = func.func_code.co_varnames[:func.func_code.co_argcount]
-	fname = func.func_name
+	fname = func.__name__
 	def echo_func(*args,**kwargs):
 		str = fname + "(" + ', '.join(
 			'%s=%r' % entry
