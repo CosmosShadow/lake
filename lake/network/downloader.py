@@ -25,6 +25,8 @@ class _download_thread(Thread):
 	def run(self):
 		while True:
 			url, save_path = self.queue.get()
+			print('url: ' + url)
+			print('save_path: ' + save_path)
 			self.download(url, save_path)
 			self.queue.task_done()
 
@@ -62,8 +64,10 @@ class _downloader(object):
 		self.scheduling()
 
 	def scheduling(self):
+		self.workers = []
 		for x in range(self.thread_count):
 			worker = _download_thread(self.queue, self.timeout, self.retry)
+			self.workers.append(worker)
 			worker.daemon = True
 			worker.start()
 
