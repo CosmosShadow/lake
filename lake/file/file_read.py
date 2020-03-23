@@ -15,7 +15,7 @@ def read(path):
 
 
 def read_csv(path, delimiter=','):
-	with file(path, 'rb') as csvfile:
+	with open(path, 'r') as csvfile:
 		reader = csv.reader(csvfile, delimiter=delimiter)
 		data = [line for line in reader]
 	return data
